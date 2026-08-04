@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Cormorant_Garamond, Jost } from 'next/font/google';
+import { Cormorant_Garamond, Jost, Tenor_Sans } from 'next/font/google';
 import { getSiteUrl, SITE_DESCRIPTION, SITE_NAME } from '@/lib/site';
 import {
   getOrganizationJsonLd,
@@ -19,6 +19,13 @@ const jost = Jost({
   subsets: ['latin'],
   weight: ['300', '400', '500'],
   variable: '--font-jost',
+  display: 'swap',
+});
+
+const tenorSans = Tenor_Sans({
+  subsets: ['latin'],
+  weight: '400',
+  variable: '--font-tenor-sans',
   display: 'swap',
 });
 
@@ -92,7 +99,10 @@ export default function RootLayout({
   const productsLd = getProductListJsonLd();
 
   return (
-    <html lang="en" className={`${cormorant.variable} ${jost.variable}`}>
+    <html
+      lang="en"
+      className={`${cormorant.variable} ${jost.variable} ${tenorSans.variable}`}
+    >
       <body className="bg-white text-stone-700 overflow-x-hidden antialiased">
         <a href="#home" className="skip-link">
           Skip to content

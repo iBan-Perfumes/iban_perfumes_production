@@ -8,7 +8,7 @@ export function Collection() {
       <div className="max-w-7xl mx-auto px-6">
         <Reveal className="text-center mb-16">
           <p className="text-amber-700 tracking-[0.4em] text-xs mb-4">SIGNATURE LINE</p>
-          <h2 className="font-serif text-4xl sm:text-5xl text-stone-900">The Collection</h2>
+          <h2 className="font-tenor text-3xl font-normal tracking-tight text-stone-900 sm:text-4xl">The Collection</h2>
           <p className="text-stone-500 mt-4 max-w-lg mx-auto">
             Six compositions, each a world of its own. Find the one that tells your story.
           </p>

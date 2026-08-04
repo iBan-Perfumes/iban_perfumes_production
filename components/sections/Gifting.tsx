@@ -28,7 +28,7 @@ export function Gifting() {
       <div className="max-w-7xl mx-auto px-6">
         <Reveal className="text-center mb-16">
           <p className="text-amber-700 tracking-[0.4em] text-xs mb-4">THE ART OF GIVING</p>
-          <h2 className="font-serif text-4xl sm:text-5xl text-stone-900">Gifting & Sets</h2>
+          <h2 className="font-tenor text-3xl font-normal tracking-tight text-stone-900 sm:text-4xl">Gifting & Sets</h2>
           <p className="text-stone-500 mt-4 max-w-lg mx-auto">
             Present a moment of luxury. Each set is wrapped by hand in our signature boxes.
           </p>

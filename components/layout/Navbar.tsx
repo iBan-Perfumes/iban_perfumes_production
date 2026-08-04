@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Search, ShoppingBag, User, Menu, X, Heart } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { navLinks, SITE_NAME } from '@/lib/site';
 
 export function Navbar() {
@@ -31,7 +31,7 @@ export function Navbar() {
       }`}
     >
       <nav className="max-w-7xl mx-auto px-6 flex items-center justify-between" aria-label="Primary">
-        <div className="flex items-center gap-5 flex-1">
+        <div className="flex items-center flex-1">
           <button
             className="lg:hidden text-stone-700"
             onClick={() => setOpen(!open)}
@@ -40,12 +40,6 @@ export function Navbar() {
             aria-controls="mobile-menu"
           >
             {open ? <X size={22} /> : <Menu size={22} />}
-          </button>
-          <button
-            className="hidden lg:flex text-stone-600 hover:text-amber-700 transition-colors"
-            aria-label="Search"
-          >
-            <Search size={20} />
           </button>
         </div>
 
@@ -56,26 +50,7 @@ export function Navbar() {
           {SITE_NAME.toUpperCase()}
         </a>
 
-        <div className="flex items-center gap-5 flex-1 justify-end">
-          <button
-            className="hidden lg:flex text-stone-600 hover:text-amber-700 transition-colors"
-            aria-label="Account"
-          >
-            <User size={20} />
-          </button>
-          <button
-            className="hidden lg:flex text-stone-600 hover:text-amber-700 transition-colors"
-            aria-label="Wishlist"
-          >
-            <Heart size={20} />
-          </button>
-          <button
-            className="text-stone-600 hover:text-amber-700 transition-colors"
-            aria-label="Bag"
-          >
-            <ShoppingBag size={20} />
-          </button>
-        </div>
+        <div className="flex-1" aria-hidden="true" />
       </nav>
 
       <ul className="hidden lg:flex items-center justify-center gap-8 mt-3 px-6" role="list">

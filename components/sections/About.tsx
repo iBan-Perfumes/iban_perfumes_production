@@ -26,7 +26,7 @@ export function About() {
       <div className="max-w-7xl mx-auto px-6">
         <Reveal className="text-center mb-16">
           <p className="text-amber-700 tracking-[0.4em] text-xs mb-4">OUR PHILOSOPHY</p>
-          <h2 className="font-serif text-4xl sm:text-5xl text-stone-900">A Century of Scent</h2>
+          <h2 className="font-tenor text-3xl font-normal tracking-tight text-stone-900 sm:text-4xl">A Century of Scent</h2>
         </Reveal>
 
         <div className="grid md:grid-cols-2 gap-12 items-center">

@@ -10,6 +10,7 @@ const config: Config = {
       fontFamily: {
         sans: ['var(--font-jost)', 'sans-serif'],
         serif: ['var(--font-cormorant)', 'serif'],
+        tenor: ['var(--font-tenor-sans)', 'Tenor Sans', 'sans-serif'],
       },
     },
   },

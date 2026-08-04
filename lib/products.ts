@@ -55,35 +55,3 @@ export const womenScents = [
   { name: 'Jardin Secret', note: 'Peony · White Musk · Cedar' },
   { name: 'Soie Dorée', note: 'Honey · Orange Blossom · Amber' },
 ] as const;
-
-export interface HeroSlide {
-  image: string;
-  eyebrow: string;
-  title: string;
-  titleAccent: string;
-  text: string;
-}
-
-export const heroSlides: HeroSlide[] = [
-  {
-    image: '/images/hero-1.jpg',
-    eyebrow: 'NEW ARRIVAL',
-    title: 'The Art of',
-    titleAccent: 'Fragrance',
-    text: 'Discover a curated collection of rare and refined perfumes, crafted by master perfumers to capture emotion in a bottle.',
-  },
-  {
-    image: '/images/hero-2.jpg',
-    eyebrow: 'SIGNATURE LINE',
-    title: 'Scents That',
-    titleAccent: 'Linger',
-    text: 'Each composition is layered slowly — bergamot, oud, rose and amber — until it finds its own perfect balance.',
-  },
-  {
-    image: '/images/hero-3.jpg',
-    eyebrow: 'MAISON DE PARFUM',
-    title: 'A Century of',
-    titleAccent: 'Elegance',
-    text: 'For over a hundred years, Aurélia has pursued a single belief — that a fragrance is a memory, a presence, a quiet signature.',
-  },
-];
