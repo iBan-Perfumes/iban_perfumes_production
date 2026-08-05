@@ -10,11 +10,16 @@ export function getSiteUrl(): string {
   );
 }
 
+/** Crawl only when ALLOW_INDEXING is exactly "true" (case-insensitive). Empty/false = no index. */
+export function isIndexingAllowed(): boolean {
+  return process.env.ALLOW_INDEXING?.trim().toLowerCase() === 'true';
+}
+
 export const navLinks = [
-  { label: 'Home', href: '/#home' },
-  { label: 'Collection', href: '/#collection' },
+  { label: 'Home', href: '/home' },
+  { label: 'Collection', href: '/collection' },
   { label: 'About', href: '/about' },
-  { label: 'Contact', href: '/#contact' },
+  { label: 'Contact', href: '/contact' },
 ] as const;
 
 export const contactInfo: {

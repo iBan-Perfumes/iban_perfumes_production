@@ -3,8 +3,8 @@ export const aboutHero = {
   heading: 'Crafting Fragrances That Become Memories.',
   description:
     "At i-BAN Perfumes, we believe fragrance is more than a scent—it's an expression of personality, confidence, and unforgettable moments. Every bottle is thoughtfully created to bring luxury, elegance, and long-lasting freshness into everyday life.",
-  primaryCta: { label: 'Explore Collection', href: '/#collection' },
-  secondaryCta: { label: 'Contact Us', href: '/#contact' },
+  primaryCta: { label: 'Explore Collection', href: '/collection' },
+  secondaryCta: { label: 'Contact Us', href: '/contact' },
   image: '/images/cinematic/ORIS_BANNER_IMG.png',
 } as const;
 
@@ -111,7 +111,7 @@ export const fragranceCategories = [
     description:
       'A refreshing combination of citrus freshness, tropical fruits, elegant florals, smooth sandalwood, and soft musk.',
     images: ['/images/product_images/ORIS_PERFUME.png'],
-    href: '/#featured',
+    href: '/collection',
   },
   {
     id: 'fresh-floral',
@@ -120,7 +120,7 @@ export const fragranceCategories = [
     description:
       'Fresh citrus opening blended with calming lavender, romantic rose, warm vanilla, and deep oud for a heavenly experience.',
     images: ['/images/product_images/FROM_HEAVENS_PERFUME.png'],
-    href: '/#featured',
+    href: '/collection',
   },
   {
     id: 'fruity-floral',
@@ -132,7 +132,7 @@ export const fragranceCategories = [
       '/images/product_images/ROYAL_BERRY_PERFUME.png',
       '/images/product_images/HALA_PARIS_PERFUME.png',
     ],
-    href: '/#featured',
+    href: '/collection',
   },
   {
     id: 'oud-leathery',
@@ -141,7 +141,7 @@ export const fragranceCategories = [
     description:
       'Rich oud layered with honey, saffron, luxurious leather, and soft musk for a bold and unforgettable signature scent.',
     images: ['/images/product_images/MIRAJ_PERFUME.png'],
-    href: '/#featured',
+    href: '/collection',
   },
 ] as const;
 
@@ -210,8 +210,8 @@ export const aboutCta = {
   heading: 'Find Your Signature Fragrance',
   description:
     'Explore the i-BAN collection and discover premium fragrances crafted to suit every personality and every occasion.',
-  primaryCta: { label: 'Shop Collection', href: '/#featured' },
-  secondaryCta: { label: 'Contact Us', href: '/#contact' },
+  primaryCta: { label: 'Shop Collection', href: '/collection' },
+  secondaryCta: { label: 'Contact Us', href: '/contact' },
 } as const;
 
 export const aboutPageSeo = {

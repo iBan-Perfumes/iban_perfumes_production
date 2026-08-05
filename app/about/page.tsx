@@ -46,7 +46,7 @@ export const metadata: Metadata = {
 
 export default function AboutPage() {
   const breadcrumbLd = getBreadcrumbJsonLd([
-    { name: 'Home', path: '/' },
+    { name: 'Home', path: '/home' },
     { name: 'About', path: '/about' },
   ]);
   const aboutLd = getAboutPageJsonLd();

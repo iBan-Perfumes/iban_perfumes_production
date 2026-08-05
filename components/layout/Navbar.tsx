@@ -58,7 +58,7 @@ export function Navbar() {
         aria-label="Primary"
       >
         <Link
-          href="/#home"
+          href="/home"
           className="inline-flex items-center gap-3"
           aria-label="i-BAN Perfumes home"
         >

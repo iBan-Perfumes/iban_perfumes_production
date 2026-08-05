@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Cormorant_Garamond, Jost, Tenor_Sans } from 'next/font/google';
 import { Footer } from '@/components/layout/Footer';
 import { Navbar } from '@/components/layout/Navbar';
-import { getSiteUrl, SITE_DESCRIPTION, SITE_NAME } from '@/lib/site';
+import { getSiteUrl, isIndexingAllowed, SITE_DESCRIPTION, SITE_NAME } from '@/lib/site';
 import {
   getOrganizationJsonLd,
   getProductListJsonLd,
@@ -33,6 +33,7 @@ const tenorSans = Tenor_Sans({
 });
 
 const siteUrl = getSiteUrl();
+const allowIndexing = isIndexingAllowed();
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -59,12 +60,12 @@ export const metadata: Metadata = {
   creator: SITE_NAME,
   publisher: SITE_NAME,
   alternates: {
-    canonical: '/',
+    canonical: '/home',
   },
   openGraph: {
     type: 'website',
     locale: 'en_IN',
-    url: siteUrl,
+    url: `${siteUrl}/home`,
     siteName: SITE_NAME,
     title: `${SITE_NAME} | Luxury Eau de Parfum`,
     description: SITE_DESCRIPTION,
@@ -83,17 +84,27 @@ export const metadata: Metadata = {
     description: SITE_DESCRIPTION,
     images: ['/images/cinematic/ORIS_BANNER_IMG.png'],
   },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
-    },
-  },
+  robots: allowIndexing
+    ? {
+        index: true,
+        follow: true,
+        googleBot: {
+          index: true,
+          follow: true,
+          'max-video-preview': -1,
+          'max-image-preview': 'large',
+          'max-snippet': -1,
+        },
+      }
+    : {
+        index: false,
+        follow: false,
+        googleBot: {
+          index: false,
+          follow: false,
+          noimageindex: true,
+        },
+      },
 };
 
 export default function RootLayout({
@@ -110,7 +121,7 @@ export default function RootLayout({
       className={`${cormorant.variable} ${jost.variable} ${tenorSans.variable}`}
     >
       <body className="bg-white text-stone-700 overflow-x-hidden antialiased">
-        <Link href="/#home" className="skip-link">
+        <Link href="/home" className="skip-link">
           Skip to content
         </Link>
         <script

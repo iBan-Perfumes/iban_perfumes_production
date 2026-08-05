@@ -1,8 +1,19 @@
 import type { MetadataRoute } from 'next';
-import { getSiteUrl } from '@/lib/site';
+import { getSiteUrl, isIndexingAllowed } from '@/lib/site';
 
 export default function robots(): MetadataRoute.Robots {
   const base = getSiteUrl();
+  const allowIndexing = isIndexingAllowed();
+
+  if (!allowIndexing) {
+    return {
+      rules: {
+        userAgent: '*',
+        disallow: '/',
+      },
+    };
+  }
+
   return {
     rules: {
       userAgent: '*',
