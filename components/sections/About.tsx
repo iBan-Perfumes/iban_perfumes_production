@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { Flower2, Sparkles, Gift } from 'lucide-react';
 import { Reveal } from '@/components/ui/Reveal';
 
@@ -26,17 +27,14 @@ export function About() {
         <div className="grid items-start gap-12 md:grid-cols-2">
           <Reveal direction="left">
             <div className="relative">
-              <div
-                className="relative w-full overflow-hidden rounded-lg bg-stone-900 shadow-xl"
-                aria-label="i-BAN Perfumes ORIS fragrance film"
-              >
-                <video
-                  src="/images/cinematic/Oris_video.mp4"
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  className="banner-video block h-auto w-full object-contain object-center"
+              <div className="relative w-full overflow-hidden rounded-lg bg-stone-900 shadow-xl">
+                <Image
+                  src="/images/oris_img.png"
+                  alt="i-BAN Perfumes ORIS eau de parfum"
+                  width={1148}
+                  height={1370}
+                  sizes="(min-width: 768px) 50vw, 100vw"
+                  className="block h-auto w-full object-contain object-center"
                 />
               </div>
               <div className="absolute -bottom-6 -right-6 -z-10 h-32 w-32 rounded-lg border border-amber-200" />

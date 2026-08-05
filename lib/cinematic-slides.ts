@@ -88,7 +88,7 @@ export const cinematicSlides: CinematicSlide[] = [
     secondaryAction: 'Our Story',
     primaryHref: '#collection',
     secondaryHref: '#about',
-    image: '/images/cinematic/MIRAJ_BANNER_IMAGE.png',
+    image: '/images/cinematic/MARJBANNER_IMG_01.png',
     previewImage: '/images/cinematic/marj.png',
     theme: 'amber',
   },
