@@ -199,6 +199,7 @@ export function Hero() {
   return (
     <section
       id="home"
+      data-site-hero
       className={`cinematic-carousel theme-${slide.theme}`}
       tabIndex={0}
       role="region"
@@ -234,7 +235,7 @@ export function Hero() {
 
       <div className="cc-shell">
         <header className="cc-top-bar">
-          <a href="#home" className="cc-brand" aria-label="i-BAN Perfumes home">
+          <a href="/home" className="cc-brand" aria-label="i-BAN Perfumes home">
             <span className="cc-brand-mark" aria-hidden="true">
               <span>iB</span>
             </span>

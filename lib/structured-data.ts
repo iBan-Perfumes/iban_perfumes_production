@@ -1,25 +1,21 @@
-import { contactInfo, getSiteUrl, SITE_DESCRIPTION, SITE_NAME } from '@/lib/site';
-import { products } from '@/lib/products';
+import { getSiteUrl, SITE_DESCRIPTION, SITE_NAME } from '@/lib/site';
+import { catalogProducts } from '@/lib/catalog';
+import { aboutPageSeo } from '@/lib/about-content';
+import { collectionPageSeo } from '@/lib/collection-content';
 
 export function getOrganizationJsonLd() {
   const url = getSiteUrl();
   return {
     '@context': 'https://schema.org',
-    '@type': 'PerfumeStore',
-    name: `${SITE_NAME} Maison de Parfum`,
+    '@type': 'Organization',
+    name: SITE_NAME,
     description: SITE_DESCRIPTION,
     url,
-    email: contactInfo.email,
-    telephone: contactInfo.phone,
-    address: {
-      '@type': 'PostalAddress',
-      streetAddress: '12 Rue de la Paix',
-      addressLocality: 'Paris',
-      postalCode: '75002',
-      addressCountry: 'FR',
+    image: `${url}/images/cinematic/ORIS_BANNER_IMG.png`,
+    brand: {
+      '@type': 'Brand',
+      name: SITE_NAME,
     },
-    image: `${url}/images/hero-1.jpg`,
-    priceRange: '₹₹₹',
   };
 }
 
@@ -29,14 +25,15 @@ export function getProductListJsonLd() {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
     name: `${SITE_NAME} Signature Collection`,
-    itemListElement: products.map((p, i) => ({
+    itemListElement: catalogProducts.map((p, i) => ({
       '@type': 'ListItem',
       position: i + 1,
       item: {
         '@type': 'Product',
         name: p.name,
-        description: p.note,
-        image: `${url}${p.image}`,
+        description: p.description,
+        image: `${url}${p.perfumeImage}`,
+        url: `${url}/products/${p.slug}`,
         brand: {
           '@type': 'Brand',
           name: SITE_NAME,
@@ -44,10 +41,106 @@ export function getProductListJsonLd() {
         offers: {
           '@type': 'Offer',
           priceCurrency: 'INR',
-          price: p.price.replace(/[₹,]/g, ''),
-          availability: 'https://schema.org/InStock',
+          price: String(p.priceValue),
+          availability: p.available
+            ? 'https://schema.org/InStock'
+            : 'https://schema.org/OutOfStock',
         },
       },
     })),
+  };
+}
+
+export function getBreadcrumbJsonLd(
+  items: { name: string; path: string }[]
+) {
+  const url = getSiteUrl();
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map((item, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: item.name,
+      item: `${url}${item.path === '/' ? '' : item.path}`,
+    })),
+  };
+}
+
+export function getAboutPageJsonLd() {
+  const url = getSiteUrl();
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'AboutPage',
+    name: `${aboutPageSeo.title} | ${SITE_NAME}`,
+    description: aboutPageSeo.description,
+    url: `${url}/about`,
+    isPartOf: {
+      '@type': 'WebSite',
+      name: SITE_NAME,
+      url,
+    },
+    mainEntity: {
+      '@type': 'Organization',
+      name: SITE_NAME,
+      description: SITE_DESCRIPTION,
+      url,
+    },
+  };
+}
+
+export function getCollectionPageJsonLd() {
+  const url = getSiteUrl();
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: `${collectionPageSeo.title} | ${SITE_NAME}`,
+    description: collectionPageSeo.description,
+    url: `${url}/collection`,
+    isPartOf: {
+      '@type': 'WebSite',
+      name: SITE_NAME,
+      url,
+    },
+    mainEntity: {
+      '@type': 'ItemList',
+      name: `${SITE_NAME} Fragrance Collection`,
+      numberOfItems: catalogProducts.length,
+      itemListElement: catalogProducts.map((p, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        url: `${url}/products/${p.slug}`,
+        name: p.name,
+      })),
+    },
+  };
+}
+
+export function getProductJsonLd(slug: string) {
+  const product = catalogProducts.find((p) => p.slug === slug);
+  if (!product) return null;
+
+  const url = getSiteUrl();
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.name,
+    description: product.description,
+    image: [`${url}${product.perfumeImage}`, `${url}${product.notesImage}`],
+    url: `${url}/products/${product.slug}`,
+    brand: {
+      '@type': 'Brand',
+      name: SITE_NAME,
+    },
+    category: product.category,
+    offers: {
+      '@type': 'Offer',
+      priceCurrency: 'INR',
+      price: String(product.priceValue),
+      availability: product.available
+        ? 'https://schema.org/InStock'
+        : 'https://schema.org/OutOfStock',
+      url: `${url}/products/${product.slug}`,
+    },
   };
 }

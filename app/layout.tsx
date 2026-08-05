@@ -1,6 +1,9 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { Cormorant_Garamond, Jost, Tenor_Sans } from 'next/font/google';
-import { getSiteUrl, SITE_DESCRIPTION, SITE_NAME } from '@/lib/site';
+import { Footer } from '@/components/layout/Footer';
+import { Navbar } from '@/components/layout/Navbar';
+import { getSiteUrl, isIndexingAllowed, SITE_DESCRIPTION, SITE_NAME } from '@/lib/site';
 import {
   getOrganizationJsonLd,
   getProductListJsonLd,
@@ -30,64 +33,78 @@ const tenorSans = Tenor_Sans({
 });
 
 const siteUrl = getSiteUrl();
+const allowIndexing = isIndexingAllowed();
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: `${SITE_NAME} Maison de Parfum | Luxury Fragrances`,
+    default: `${SITE_NAME} | Luxury Eau de Parfum`,
     template: `%s | ${SITE_NAME}`,
   },
   description: SITE_DESCRIPTION,
   keywords: [
+    'i-BAN Perfumes',
     'perfume',
     'fragrance',
     'luxury perfume',
-    'Aurélia',
     'eau de parfum',
-    'Grasse',
-    'Paris',
-    'oud',
-    'rose perfume',
+    'ORIS',
+    'Royal Berry',
+    'From Heavens',
+    'MARJ',
+    'Hala Paris',
+    'oud perfume',
+    'affordable luxury perfume',
   ],
-  authors: [{ name: `${SITE_NAME} Maison de Parfum` }],
+  authors: [{ name: SITE_NAME }],
   creator: SITE_NAME,
-  publisher: `${SITE_NAME} Maison de Parfum`,
+  publisher: SITE_NAME,
   alternates: {
-    canonical: '/',
+    canonical: '/home',
   },
   openGraph: {
     type: 'website',
-    locale: 'en_US',
-    url: siteUrl,
-    siteName: `${SITE_NAME} Maison de Parfum`,
-    title: `${SITE_NAME} Maison de Parfum | Luxury Fragrances`,
+    locale: 'en_IN',
+    url: `${siteUrl}/home`,
+    siteName: SITE_NAME,
+    title: `${SITE_NAME} | Luxury Eau de Parfum`,
     description: SITE_DESCRIPTION,
     images: [
       {
-        url: '/images/hero-1.jpg',
-        width: 1800,
-        height: 1200,
-        alt: `${SITE_NAME} — The Art of Fragrance`,
+        url: '/images/cinematic/ORIS_BANNER_IMG.png',
+        width: 1920,
+        height: 1080,
+        alt: `${SITE_NAME} — Crafting Fragrances That Become Memories`,
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: `${SITE_NAME} Maison de Parfum | Luxury Fragrances`,
+    title: `${SITE_NAME} | Luxury Eau de Parfum`,
     description: SITE_DESCRIPTION,
-    images: ['/images/hero-1.jpg'],
+    images: ['/images/cinematic/ORIS_BANNER_IMG.png'],
   },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
-    },
-  },
+  robots: allowIndexing
+    ? {
+        index: true,
+        follow: true,
+        googleBot: {
+          index: true,
+          follow: true,
+          'max-video-preview': -1,
+          'max-image-preview': 'large',
+          'max-snippet': -1,
+        },
+      }
+    : {
+        index: false,
+        follow: false,
+        googleBot: {
+          index: false,
+          follow: false,
+          noimageindex: true,
+        },
+      },
 };
 
 export default function RootLayout({
@@ -104,9 +121,9 @@ export default function RootLayout({
       className={`${cormorant.variable} ${jost.variable} ${tenorSans.variable}`}
     >
       <body className="bg-white text-stone-700 overflow-x-hidden antialiased">
-        <a href="#home" className="skip-link">
+        <Link href="/home" className="skip-link">
           Skip to content
-        </a>
+        </Link>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationLd) }}
@@ -115,7 +132,9 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(productsLd) }}
         />
+        <Navbar />
         {children}
+        <Footer />
       </body>
     </html>
   );

@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { SITE_NAME } from '@/lib/site';
 
 const footerLinks = ['Privacy', 'Terms', 'Shipping', 'Returns', 'FAQ'] as const;
@@ -14,7 +15,7 @@ export function Footer() {
               {SITE_NAME.toUpperCase()}
             </p>
             <p className="text-stone-400 text-xs tracking-widest mt-2">
-              MAISON DE PARFUM · PARIS
+              EAU DE PARFUM · EVERYDAY LUXURY
             </p>
           </div>
 
@@ -27,12 +28,17 @@ export function Footer() {
                   </a>
                 </li>
               ))}
+              <li>
+                <Link href="/about" className="hover:text-amber-200 transition-colors">
+                  About
+                </Link>
+              </li>
             </ul>
           </nav>
         </div>
 
         <div className="mt-10 pt-6 border-t border-white/5 text-center text-stone-500 text-xs tracking-wider">
-          © {year} Aurélia Maison de Parfum. Crafted in Grasse, France.
+          © {year} {SITE_NAME}. Premium fragrances for everyday luxury.
         </div>
       </div>
     </footer>
