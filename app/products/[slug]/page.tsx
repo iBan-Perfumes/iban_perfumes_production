@@ -1,7 +1,11 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { ProductDetail } from '@/components/products/ProductDetail';
-import { catalogProducts, getProductBySlug } from '@/lib/catalog';
+import {
+  catalogProducts,
+  getProductBySlug,
+  getRelatedProducts,
+} from '@/lib/catalog';
 import { SITE_NAME } from '@/lib/site';
 import {
   getBreadcrumbJsonLd,
@@ -25,9 +29,11 @@ export async function generateMetadata({
     return { title: 'Product Not Found' };
   }
 
+  const description = product.heroCopy || product.story || product.description;
+
   return {
     title: product.name,
-    description: product.description,
+    description,
     alternates: {
       canonical: `/products/${product.slug}`,
     },
@@ -36,7 +42,7 @@ export async function generateMetadata({
       url: `/products/${product.slug}`,
       siteName: SITE_NAME,
       title: `${product.name} | ${SITE_NAME}`,
-      description: product.description,
+      description,
       images: [
         {
           url: product.perfumeImage,
@@ -49,7 +55,7 @@ export async function generateMetadata({
     twitter: {
       card: 'summary_large_image',
       title: `${product.name} | ${SITE_NAME}`,
-      description: product.description,
+      description,
       images: [product.perfumeImage],
     },
   };
@@ -60,6 +66,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const product = getProductBySlug(slug);
   if (!product) notFound();
 
+  const related = getRelatedProducts(product.slug);
   const breadcrumbLd = getBreadcrumbJsonLd([
     { name: 'Home', path: '/home' },
     { name: 'Collection', path: '/collection' },
@@ -80,7 +87,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
         />
       )}
       <main id="main">
-        <ProductDetail product={product} />
+        <ProductDetail product={product} related={related} />
       </main>
     </>
   );
