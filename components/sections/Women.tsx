@@ -25,7 +25,7 @@ export function Women() {
           <Reveal direction="right" delay={150}>
             <div>
               <p className="text-amber-700 tracking-[0.4em] text-xs mb-4">FOR HER</p>
-              <h2 className="font-serif text-4xl sm:text-5xl text-stone-900 mb-6">
+              <h2 className="mb-6 font-tenor text-3xl font-normal tracking-tight text-stone-900 sm:text-4xl">
                 Grace in Every Note
               </h2>
               <p className="text-stone-500 leading-relaxed mb-8">
