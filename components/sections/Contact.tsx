@@ -28,7 +28,7 @@ export function Contact() {
             <div>
               <p className="text-amber-700 tracking-[0.4em] text-xs mb-4">GET IN TOUCH</p>
               <h2 className="mb-6 font-tenor text-3xl font-normal tracking-tight text-stone-900 sm:text-4xl">
-                Join the Maison
+                Get in Touch
               </h2>
               <p className="text-stone-500 leading-relaxed mb-10">
                 Subscribe for early access to new releases, private events, and the stories behind
@@ -36,18 +36,29 @@ export function Contact() {
               </p>
 
               <div className="space-y-5">
-                <div className="flex items-center gap-4 text-stone-600">
-                  <MapPin size={20} className="text-amber-700" aria-hidden />
-                  <span>{contactInfo.address}</span>
-                </div>
-                <div className="flex items-center gap-4 text-stone-600">
-                  <Phone size={20} className="text-amber-700" aria-hidden />
-                  <a href={`tel:${contactInfo.phone.replace(/\s/g, '')}`}>{contactInfo.phone}</a>
-                </div>
-                <div className="flex items-center gap-4 text-stone-600">
-                  <Mail size={20} className="text-amber-700" aria-hidden />
-                  <a href={`mailto:${contactInfo.email}`}>{contactInfo.email}</a>
-                </div>
+                {contactInfo.address && (
+                  <div className="flex items-center gap-4 text-stone-600">
+                    <MapPin size={20} className="text-amber-700" aria-hidden />
+                    <span>{contactInfo.address}</span>
+                  </div>
+                )}
+                {contactInfo.phone && (
+                  <div className="flex items-center gap-4 text-stone-600">
+                    <Phone size={20} className="text-amber-700" aria-hidden />
+                    <a href={`tel:${contactInfo.phone.replace(/\s/g, '')}`}>{contactInfo.phone}</a>
+                  </div>
+                )}
+                {contactInfo.email && (
+                  <div className="flex items-center gap-4 text-stone-600">
+                    <Mail size={20} className="text-amber-700" aria-hidden />
+                    <a href={`mailto:${contactInfo.email}`}>{contactInfo.email}</a>
+                  </div>
+                )}
+                {!contactInfo.address && !contactInfo.phone && !contactInfo.email && (
+                  <p className="text-sm text-stone-500">
+                    Use the form to send us a message — we typically respond within 1–2 business days.
+                  </p>
+                )}
               </div>
 
               <div className="flex gap-4 mt-10">
@@ -113,7 +124,7 @@ export function Contact() {
                 className="w-full py-3 bg-stone-900 text-white tracking-widest text-sm hover:bg-amber-700 transition-all duration-300"
                 aria-live="polite"
               >
-                {sent ? 'MESSAGE SENT — MERCI' : 'SEND MESSAGE'}
+                {sent ? 'MESSAGE SENT — THANK YOU' : 'SEND MESSAGE'}
               </button>
             </form>
           </Reveal>

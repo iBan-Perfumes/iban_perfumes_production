@@ -1,4 +1,3 @@
-import { Footer } from '@/components/layout/Footer';
 import { Hero } from '@/components/sections/Hero';
 import { About } from '@/components/sections/About';
 import { Featured } from '@/components/sections/Featured';
@@ -11,19 +10,16 @@ import { Contact } from '@/components/sections/Contact';
 
 export default function HomePage() {
   return (
-    <>
-      <main>
-        <Hero />
-        <About />
-        <Featured />
-        <Collection />
-        <Men />
-        <Women />
-        <Quote />
-        <Gifting />
-        <Contact />
-      </main>
-      <Footer />
-    </>
+    <main id="main">
+      <Hero />
+      <About />
+      <Featured />
+      <Collection />
+      <Men />
+      <Women />
+      <Quote />
+      <Gifting />
+      <Contact />
+    </main>
   );
 }

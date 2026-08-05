@@ -199,6 +199,7 @@ export function Hero() {
   return (
     <section
       id="home"
+      data-site-hero
       className={`cinematic-carousel theme-${slide.theme}`}
       tabIndex={0}
       role="region"

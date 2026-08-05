@@ -110,3 +110,47 @@ textarea:focus-visible {
 .scrollbar-none::-webkit-scrollbar {
   display: none;
 }
+
+@keyframes about-float {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 0.35;
+  }
+  50% {
+    transform: translateY(-18px) scale(1.15);
+    opacity: 0.85;
+  }
+}
+
+@keyframes about-glow-drift {
+  0%,
+  100% {
+    transform: translate(-8%, -4%) scale(1);
+  }
+  50% {
+    transform: translate(6%, 8%) scale(1.12);
+  }
+}
+
+.about-particle {
+  position: absolute;
+  border-radius: 9999px;
+  background: rgba(251, 191, 36, 0.55);
+  box-shadow: 0 0 12px rgba(251, 191, 36, 0.35);
+  animation-name: about-float;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  pointer-events: none;
+}
+
+.about-cta-glow {
+  animation: about-glow-drift 14s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .about-particle,
+  .about-cta-glow {
+    animation: none;
+  }
+}

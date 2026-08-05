@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import { Flower2, Sparkles, Gift } from 'lucide-react';
 import { Reveal } from '@/components/ui/Reveal';
 
@@ -26,14 +27,14 @@ export function About() {
       <div className="mx-auto max-w-7xl px-6">
         <div className="grid items-start gap-12 md:grid-cols-2">
           <Reveal direction="left">
-            <div className="relative">
+            <div className="relative mx-auto w-full max-w-[420px]">
               <div className="relative w-full overflow-hidden rounded-lg bg-stone-900 shadow-xl">
                 <Image
                   src="/images/oris_img.png"
                   alt="i-BAN Perfumes ORIS eau de parfum"
                   width={1148}
                   height={1370}
-                  sizes="(min-width: 768px) 50vw, 100vw"
+                  sizes="(min-width: 768px) 420px, 100vw"
                   className="block h-auto w-full object-contain object-center"
                 />
               </div>
@@ -52,11 +53,19 @@ export function About() {
                 scents that feel refined, modern, and true to you. From citrus and florals to oud
                 and berries, each bottle is designed for daily presence.
               </p>
-              <p className="mb-10 leading-relaxed text-stone-500">
+              <p className="mb-6 leading-relaxed text-stone-500">
                 We believe luxury should be accessible. Our signature collection — ORIS, Royal
                 Berry, From Heavens, MARJ, and Hala Paris — brings carefully composed fragrances
                 to you in a compact 20 ml format, ready to wear or gift.
               </p>
+
+              <Link
+                href="/about"
+                className="mb-10 inline-flex items-center gap-2 text-sm font-medium tracking-wide text-amber-700 transition-colors hover:text-amber-800"
+              >
+                Read our story
+                <span aria-hidden="true">→</span>
+              </Link>
 
               <div className="space-y-6">
                 {features.map((f) => (

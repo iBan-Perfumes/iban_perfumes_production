@@ -1,17 +1,34 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { Menu, X } from 'lucide-react';
-import { navLinks, SITE_NAME } from '@/lib/site';
+import { navLinks } from '@/lib/site';
 
 export function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
+  const [visible, setVisible] = useState(false);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
+    const hero =
+      document.querySelector('[data-site-hero]') ??
+      document.getElementById('home');
+
+    if (hero) {
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          setVisible(!entry.isIntersecting);
+        },
+        { threshold: 0 }
+      );
+      observer.observe(hero);
+      return () => observer.disconnect();
+    }
+
+    // Routes without a hero banner: show after a short scroll.
+    const onScroll = () => setVisible(window.scrollY > 80);
     onScroll();
-    window.addEventListener('scroll', onScroll);
+    window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
@@ -24,60 +41,88 @@ export function Navbar() {
     return () => window.removeEventListener('keydown', onKey);
   }, [open]);
 
+  useEffect(() => {
+    if (!visible) setOpen(false);
+  }, [visible]);
+
   return (
     <header
-      className={`sticky top-0 z-40 transition-all duration-300 ${
-        scrolled ? 'bg-white/95 backdrop-blur-md shadow-md py-3' : 'bg-white py-4'
+      className={`fixed inset-x-0 top-0 z-50 border-b border-stone-200 bg-white/95 shadow-sm backdrop-blur-md transition-all duration-300 ${
+        visible
+          ? 'translate-y-0 opacity-100'
+          : 'pointer-events-none -translate-y-full opacity-0'
       }`}
     >
-      <nav className="max-w-7xl mx-auto px-6 flex items-center justify-between" aria-label="Primary">
-        <div className="flex items-center flex-1">
-          <button
-            className="lg:hidden text-stone-700"
-            onClick={() => setOpen(!open)}
-            aria-label={open ? 'Close menu' : 'Open menu'}
-            aria-expanded={open}
-            aria-controls="mobile-menu"
-          >
-            {open ? <X size={22} /> : <Menu size={22} />}
-          </button>
-        </div>
-
-        <a
-          href="#home"
-          className="font-serif text-2xl sm:text-3xl tracking-[0.25em] text-stone-900"
+      <nav
+        className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-3 sm:px-8"
+        aria-label="Primary"
+      >
+        <Link
+          href="/#home"
+          className="inline-flex items-center gap-3"
+          aria-label="i-BAN Perfumes home"
         >
-          {SITE_NAME.toUpperCase()}
-        </a>
+          <span
+            className="grid h-10 w-10 place-items-center overflow-hidden rounded-[12px] border border-stone-200 bg-stone-900 text-[0.68rem] font-bold tracking-wide text-white"
+            aria-hidden="true"
+          >
+            iB
+          </span>
+          <span className="flex flex-col gap-0.5">
+            <span className="text-sm font-bold tracking-wide text-stone-900">
+              i-BAN Perfumes
+            </span>
+            <span className="text-[0.6rem] font-semibold uppercase tracking-[0.16em] text-stone-400">
+              Eau de Parfum
+            </span>
+          </span>
+        </Link>
 
-        <div className="flex-1" aria-hidden="true" />
+        <ul
+          className="hidden flex-1 items-center justify-center gap-7 lg:flex"
+          role="list"
+        >
+          {navLinks.map((l) => (
+            <li key={l.href}>
+              <Link
+                href={l.href}
+                className="text-xs uppercase tracking-[0.18em] text-stone-600 transition-colors duration-300 hover:text-amber-700"
+              >
+                {l.label}
+              </Link>
+            </li>
+          ))}
+        </ul>
+
+        <button
+          type="button"
+          className="grid h-10 w-10 place-items-center rounded-full border border-stone-200 text-stone-700 transition-colors hover:border-stone-400 lg:hidden"
+          onClick={() => setOpen((v) => !v)}
+          aria-label={open ? 'Close menu' : 'Open menu'}
+          aria-expanded={open}
+          aria-controls="sticky-mobile-menu"
+        >
+          {open ? <X size={18} /> : <Menu size={18} />}
+        </button>
+
+        <div className="hidden w-10 lg:block" aria-hidden="true" />
       </nav>
 
-      <ul className="hidden lg:flex items-center justify-center gap-8 mt-3 px-6" role="list">
-        {navLinks.map((l) => (
-          <li key={l.href}>
-            <a
-              href={l.href}
-              className="text-xs tracking-[0.2em] text-stone-600 hover:text-amber-700 transition-colors duration-300"
-            >
-              {l.label.toUpperCase()}
-            </a>
-          </li>
-        ))}
-      </ul>
-
       {open && (
-        <div id="mobile-menu" className="lg:hidden bg-white border-t border-stone-200 mt-3">
-          <ul className="flex flex-col py-4 px-6 gap-4" role="list">
+        <div
+          id="sticky-mobile-menu"
+          className="border-t border-stone-200 bg-white lg:hidden"
+        >
+          <ul className="flex flex-col gap-1 px-5 py-4" role="list">
             {navLinks.map((l) => (
               <li key={l.href}>
-                <a
+                <Link
                   href={l.href}
                   onClick={() => setOpen(false)}
-                  className="text-sm tracking-widest text-stone-700 hover:text-amber-700 transition-colors"
+                  className="block rounded-lg px-3 py-2.5 text-sm uppercase tracking-[0.14em] text-stone-700 transition-colors hover:bg-stone-50 hover:text-amber-700"
                 >
-                  {l.label.toUpperCase()}
-                </a>
+                  {l.label}
+                </Link>
               </li>
             ))}
           </ul>
