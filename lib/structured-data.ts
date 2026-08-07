@@ -126,7 +126,7 @@ export function getProductJsonLd(slug: string) {
     '@type': 'Product',
     name: product.name,
     description: product.description,
-    image: [`${url}${product.perfumeImage}`, `${url}${product.notesImage}`],
+    image: product.gallery.map((g) => `${url}${g.src}`),
     url: `${url}/products/${product.slug}`,
     brand: {
       '@type': 'Brand',
