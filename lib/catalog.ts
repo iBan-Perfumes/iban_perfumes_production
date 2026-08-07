@@ -1,13 +1,34 @@
+import { cinematicSlides } from '@/lib/cinematic-slides';
+import { SITE_NAME } from '@/lib/site';
+
 export type FragranceCategory =
   | 'Fresh Fruity Musky'
   | 'Fresh Floral'
   | 'Fruity Floral'
-  | 'Oud Leathery';
+  | 'Oud Leathery'
+  | 'Woody Yellow Floral'
+  | 'Woody Aromatic'
+  | 'Oriental Woody Sweet'
+  | 'Oriental Woody Floral';
 
 export interface NotePyramid {
   top: string[];
   heart: string[];
   base: string[];
+}
+
+export interface ProductDetails {
+  brand: string;
+  format: string;
+  volume: string;
+  category: string;
+  fragranceFamily: string;
+  character: string;
+  longevity: string;
+  occasion: string;
+  gender: string;
+  concentration: string;
+  country: string;
 }
 
 export interface CatalogProduct {
@@ -22,6 +43,7 @@ export interface CatalogProduct {
   badge?: string;
   perfumeImage: string;
   notesImage: string;
+  /** Flattened note list for search/SEO helpers */
   notes: string[];
   notePyramid: NotePyramid;
   heroCopy: string;
@@ -29,14 +51,56 @@ export interface CatalogProduct {
   available: boolean;
   featured: boolean;
   createdAt: string;
+  /** PDP fields (derived) */
+  shortDescription: string;
+  family: string;
+  volume: string;
+  concentration: string;
+  availability: string;
+  previewImage: string;
+  lifestyleBanner: string;
+  gallery: { src: string; alt: string }[];
+  details: ProductDetails;
+  ingredients: string[];
 }
+
+/** Shared brand-safe copy used across all SKUs on the PDP */
+export const sharedHowToUse = [
+  'Spray on pulse points — wrists, neck, and behind the ears.',
+  'Avoid rubbing the fragrance into the skin to preserve the note pyramid.',
+  'Apply after a shower on clean, moisturized skin for best longevity.',
+  'Store upright, away from direct sunlight and extreme heat.',
+] as const;
+
+export const sharedSafety = [
+  'Flammable — keep away from open flame and heat sources.',
+  'For external use only.',
+  'Avoid contact with eyes. If contact occurs, rinse thoroughly with water.',
+  'Keep out of reach of children.',
+  'Store in a cool, dry place away from direct sunlight.',
+] as const;
 
 function flattenNotes(pyramid: NotePyramid): string[] {
   return [...pyramid.top, ...pyramid.heart, ...pyramid.base];
 }
 
+type CatalogProductBase = Omit<
+  CatalogProduct,
+  | 'notes'
+  | 'shortDescription'
+  | 'family'
+  | 'volume'
+  | 'concentration'
+  | 'availability'
+  | 'previewImage'
+  | 'lifestyleBanner'
+  | 'gallery'
+  | 'details'
+  | 'ingredients'
+>;
+
 /** Single source of truth for i-BAN fragrances. Append new SKUs here only. */
-const catalogProductsBase: Omit<CatalogProduct, 'notes'>[] = [
+const catalogProductsBase: CatalogProductBase[] = [
   {
     id: 'oris',
     slug: 'oris',
@@ -167,12 +231,201 @@ const catalogProductsBase: Omit<CatalogProduct, 'notes'>[] = [
     featured: false,
     createdAt: '2025-12-01',
   },
+  {
+    id: 'cr7',
+    slug: 'cr7',
+    name: 'CR7',
+    description:
+      'A vibrant fresh fruity musky blend — pineapple, apple, jasmine, and soft woods.',
+    character: 'Fresh · Fruity · Musky',
+    category: 'Fresh Fruity Musky',
+    price: '₹399',
+    priceValue: 399,
+    badge: 'New',
+    perfumeImage: '/images/product_images/CR_7_PERFUMES.png',
+    notesImage: '/images/product_images/CR_7_NOTES.jpeg',
+    notePyramid: {
+      top: ['Pineapple', 'Apple', 'Pear', 'Bergamot', 'Blackcurrant'],
+      heart: ['Jasmine', 'Freesia', 'Rose', 'Lily of the Valley'],
+      base: ['White Musk', 'Sandalwood', 'Cedarwood', 'Amber', 'Vanilla'],
+    },
+    heroCopy:
+      'Fresh. Fruity. Musky. A dynamic blend that opens with juicy pineapple, apple, and pear, blooms into soft florals, and settles into white musk, woods, amber, and vanilla.',
+    story:
+      'CR7 is bright and confident—tropical and crisp fruits sparkle over jasmine and rose, finishing on white musk, sandalwood, and warm amber–vanilla. Crafted for everyday energy with a polished, lasting trail.',
+    available: true,
+    featured: true,
+    createdAt: '2026-03-01',
+  },
+  {
+    id: 'jordan',
+    slug: 'jordan',
+    name: 'Jordan',
+    description:
+      'A woody aromatic composition — citrus, herbs, cypress, and deep woods.',
+    character: 'Woody · Aromatic · Fresh',
+    category: 'Woody Aromatic',
+    price: '₹399',
+    priceValue: 399,
+    badge: 'New',
+    perfumeImage: '/images/product_images/JORDAN_PERFUMES.png',
+    notesImage: '/images/product_images/JORDAN_NOTES.jpeg',
+    notePyramid: {
+      top: ['Bergamot', 'Grapefruit', 'Lavender', 'Rosemary'],
+      heart: ['Clary Sage', 'Geranium', 'Cypress', 'Juniper Berry'],
+      base: ['Cedarwood', 'Sandalwood', 'Vetiver', 'Oakmoss', 'Patchouli', 'Musk'],
+    },
+    heroCopy:
+      'Woody. Aromatic. Fresh. Opens with bergamot, grapefruit, lavender, and rosemary, moves into sage, geranium, and cypress, and rests on cedar, sandalwood, vetiver, and musk.',
+    story:
+      'Jordan brings crisp aromatic lift and grounded woods—citrus and herbs open into green cypress and juniper, then settle into cedar, sandalwood, and soft musk. A modern woody aromatic for confident daily wear.',
+    available: true,
+    featured: true,
+    createdAt: '2026-03-02',
+  },
+  {
+    id: 'kl12',
+    slug: 'kl12',
+    name: 'KL12',
+    description:
+      'An oriental woody floral — spice, rose, oud, amber, and sweet warmth.',
+    character: 'Oriental · Woody · Floral',
+    category: 'Oriental Woody Floral',
+    price: '₹399',
+    priceValue: 399,
+    badge: 'New',
+    perfumeImage: '/images/product_images/KL_12_PERFUMES.png',
+    notesImage: '/images/product_images/KL_12_NOTES.jpeg',
+    notePyramid: {
+      top: ['Bergamot', 'Pink Pepper', 'Saffron'],
+      heart: ['Rose', 'Jasmine', 'Cinnamon', 'Nutmeg'],
+      base: [
+        'Vanilla',
+        'Tonka Bean',
+        'Oud',
+        'Sandalwood',
+        'Amber',
+        'Patchouli',
+        'White Musk',
+        'Caramel',
+        'Benzoin',
+      ],
+    },
+    heroCopy:
+      'Oriental. Woody. Floral. Spiced bergamot and saffron open into rose, jasmine, and warm spice, settling into oud, amber, vanilla, caramel, and soft musk.',
+    story:
+      'KL12 is rich and expressive—pink pepper and saffron sparkle over rose and cinnamon, then deepen into oud, sandalwood, amber, and caramel warmth. A signature oriental woody floral with lasting presence.',
+    available: true,
+    featured: true,
+    createdAt: '2026-03-03',
+  },
+  {
+    id: 'liverpool',
+    slug: 'liverpool',
+    name: 'Liverpool',
+    description:
+      'An oriental woody sweet blend — citrus spice, white florals, oud, and amber.',
+    character: 'Oriental · Woody · Sweet',
+    category: 'Oriental Woody Sweet',
+    price: '₹399',
+    priceValue: 399,
+    badge: 'New',
+    perfumeImage: '/images/product_images/LIVERPOOL_PERFUMES.png',
+    notesImage: '/images/product_images/LIVERPOOL_NOTES.jpeg',
+    notePyramid: {
+      top: ['Bergamot', 'Mandarin Orange', 'Pink Pepper'],
+      heart: ['Rose', 'Jasmine Sambac', 'Orange Blossom', 'Tuberose'],
+      base: ['Oud', 'Sandalwood', 'Patchouli', 'Amber', 'Vanilla', 'Musk', 'Benzoin'],
+    },
+    heroCopy:
+      'Oriental. Woody. Sweet. Bright bergamot, mandarin, and pink pepper open into rose and white florals, finishing on oud, sandalwood, amber, vanilla, and musk.',
+    story:
+      'Liverpool balances radiance and depth—citrus spice lifts into romantic florals, then settles into oud, amber, and soft vanilla–musk sweetness. Crafted for evenings and everyday elegance alike.',
+    available: true,
+    featured: true,
+    createdAt: '2026-03-04',
+  },
+  {
+    id: 'pure-white',
+    slug: 'pure-white',
+    name: 'Pure White',
+    description:
+      'A woody yellow floral — bright citrus, ylang-ylang, and creamy woods.',
+    character: 'Woody · Yellow Floral · Soft',
+    category: 'Woody Yellow Floral',
+    price: '₹399',
+    priceValue: 399,
+    badge: 'New',
+    perfumeImage: '/images/product_images/PURE_WHITE_PERFUMES.png',
+    notesImage: '/images/product_images/PURE_WHITE_NOTE.jpeg',
+    notePyramid: {
+      top: ['Bergamot', 'Lemon', 'Mandarin Orange'],
+      heart: ['Ylang-Ylang', 'Jasmine Sambac', 'Mimosa', 'Champaca'],
+      base: ['Sandalwood', 'Cedarwood', 'Vetiver', 'White Musk', 'Amber'],
+    },
+    heroCopy:
+      'Woody. Yellow Floral. Soft. Opens with bergamot, lemon, and mandarin, blooms into ylang-ylang, jasmine, and mimosa, and rests on sandalwood, cedar, white musk, and amber.',
+    story:
+      'Pure White is luminous and refined—crisp citrus rises into golden yellow florals, then settles into creamy woods and soft musk. A graceful woody floral for polished everyday wear.',
+    available: true,
+    featured: true,
+    createdAt: '2026-03-05',
+  },
 ];
 
-export const catalogProducts: CatalogProduct[] = catalogProductsBase.map((p) => ({
-  ...p,
-  notes: flattenNotes(p.notePyramid),
-}));
+function enrichProduct(p: CatalogProductBase): CatalogProduct {
+  const slide = cinematicSlides.find((s) => s.id === p.id);
+  const flatNotes = flattenNotes(p.notePyramid);
+  const volume = '20 ML';
+  const concentration = 'EDP';
+  const previewImage = slide?.previewImage ?? p.perfumeImage;
+  const lifestyleBanner = slide?.image ?? p.perfumeImage;
+
+  const gallery: CatalogProduct['gallery'] = [
+    { src: p.perfumeImage, alt: `${p.name} perfume bottle` },
+    { src: p.notesImage, alt: `${p.name} fragrance notes` },
+  ];
+  if (previewImage !== p.perfumeImage) {
+    gallery.push({
+      src: previewImage,
+      alt: `${p.name} product preview`,
+    });
+  }
+
+  return {
+    ...p,
+    notes: flatNotes,
+    shortDescription: p.description,
+    family: p.category,
+    volume,
+    concentration,
+    availability: p.available ? 'In stock' : 'Out of stock',
+    previewImage,
+    lifestyleBanner,
+    gallery,
+    details: {
+      brand: SITE_NAME,
+      format: 'Spray',
+      volume,
+      category: p.category,
+      fragranceFamily: p.category,
+      character: p.character,
+      longevity: 'Moderate to long-lasting',
+      occasion: 'Day to evening',
+      gender: 'Unisex',
+      concentration: 'Eau de Parfum',
+      country: 'India',
+    },
+    ingredients: flatNotes,
+  };
+}
+
+export const catalogProducts: CatalogProduct[] =
+  catalogProductsBase.map(enrichProduct);
+
+export function getAllProducts(): CatalogProduct[] {
+  return catalogProducts;
+}
 
 export function getProductBySlug(slug: string): CatalogProduct | undefined {
   return catalogProducts.find((p) => p.slug === slug);

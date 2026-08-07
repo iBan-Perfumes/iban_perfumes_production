@@ -13,3 +13,15 @@ export function getWhatsAppBuyUrl(productName: string): string | null {
   const text = `Hello, I'm interested in purchasing ${productName} Eau de Parfum.`;
   return `https://wa.me/${number}?text=${encodeURIComponent(text)}`;
 }
+
+/** Quantity-aware order link used on the PDP (my-op wording). */
+export function getWhatsAppOrderUrl(
+  productName: string,
+  quantity: number
+): string | null {
+  const number = getWhatsAppNumber();
+  if (!number) return null;
+
+  const text = `Hi, I'd like to order ${quantity} × ${productName}.`;
+  return `https://wa.me/${number}?text=${encodeURIComponent(text)}`;
+}
