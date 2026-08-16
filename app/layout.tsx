@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Cormorant_Garamond, Jost, Tenor_Sans } from 'next/font/google';
 import { Footer } from '@/components/layout/Footer';
 import { Navbar } from '@/components/layout/Navbar';
+import { ScrollToTop } from '@/components/ScrollToTop';
 import { getSiteUrl, isIndexingAllowed, SITE_DESCRIPTION, SITE_NAME } from '@/lib/site';
 import {
   getOrganizationJsonLd,
@@ -133,6 +134,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(productsLd) }}
         />
         <Navbar />
+        <ScrollToTop />
         {children}
         <Footer />
       </body>

@@ -6,18 +6,21 @@ import { Men } from '@/components/sections/Men';
 import { Women } from '@/components/sections/Women';
 import { Quote } from '@/components/sections/Quote';
 import { Gifting } from '@/components/sections/Gifting';
+import { SmoothScroller } from '@/components/SmoothScroller';
 
 export default function HomePage() {
   return (
-    <main id="main">
-      <Hero />
-      <About />
-      <Featured />
-      <Collection />
-      <Men />
-      <Women />
-      <Quote />
-      <Gifting />
-    </main>
+    <SmoothScroller>
+      <main id="main">
+        <Hero />
+        <About />
+        <Featured />
+        <Collection />
+        <Men />
+        <Women />
+        <Quote />
+        <Gifting />
+      </main>
+    </SmoothScroller>
   );
 }

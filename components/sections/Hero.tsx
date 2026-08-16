@@ -9,6 +9,7 @@ import {
   type PointerEvent as ReactPointerEvent,
 } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { Menu, X } from 'lucide-react';
 import { BrandLogo } from '@/components/layout/BrandLogo';
 import { cinematicSlides } from '@/lib/cinematic-slides';
@@ -236,11 +237,11 @@ export function Hero() {
 
       <div className="cc-shell">
         <header className="cc-top-bar">
-          <a href="/" className="cc-brand" aria-label="i-BAN Perfumes home">
+          <Link href="/" className="cc-brand" aria-label="i-BAN Perfumes home">
             <span className="cc-brand-logo">
               <BrandLogo variant="transparent" tone="light" size="compact" priority />
             </span>
-          </a>
+          </Link>
 
           <ul className="cc-top-nav" role="list" aria-label="Primary">
             {navLinks.map((l) => (
@@ -372,7 +373,12 @@ export function Hero() {
                 </p>
               </div>
 
-              <div className="cc-preview-list" ref={previewListRef} role="list">
+              <div
+                className="cc-preview-list"
+                ref={previewListRef}
+                role="list"
+                data-lenis-prevent
+              >
                 {slides.map((s, i) => {
                   const isActive = i === activeIndex;
                   return (

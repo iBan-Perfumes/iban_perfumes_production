@@ -87,6 +87,7 @@ export function Featured() {
 
       <div
         ref={trackRef}
+        data-lenis-prevent-horizontal
         className="flex snap-x snap-mandatory gap-6 overflow-x-auto pb-2 pl-5 scrollbar-none scroll-pl-5 sm:pl-8 sm:scroll-pl-8"
       >
         {featuredPerfumes.map((perfume) => (

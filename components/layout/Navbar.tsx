@@ -2,36 +2,71 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Menu, X } from 'lucide-react';
 import { BrandLogo } from '@/components/layout/BrandLogo';
 import { navLinks } from '@/lib/site';
 
+function findHero() {
+  return (
+    document.querySelector('[data-site-hero]') ??
+    document.getElementById('home')
+  );
+}
+
 export function Navbar() {
+  const pathname = usePathname();
   const [visible, setVisible] = useState(false);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    const hero =
-      document.querySelector('[data-site-hero]') ??
-      document.getElementById('home');
+    setVisible(false);
 
-    if (hero) {
-      const observer = new IntersectionObserver(
+    let observer: IntersectionObserver | null = null;
+    let frameId = 0;
+    let removeScroll: (() => void) | null = null;
+    let cancelled = false;
+
+    const bindScrollFallback = () => {
+      const onScroll = () => setVisible(window.scrollY > 80);
+      onScroll();
+      window.addEventListener('scroll', onScroll, { passive: true });
+      removeScroll = () => window.removeEventListener('scroll', onScroll);
+    };
+
+    const bindHero = (hero: Element) => {
+      observer = new IntersectionObserver(
         ([entry]) => {
           setVisible(!entry.isIntersecting);
         },
         { threshold: 0 }
       );
       observer.observe(hero);
-      return () => observer.disconnect();
+    };
+
+    const hero = findHero();
+    if (hero) {
+      bindHero(hero);
+    } else {
+      // Wait one frame for the new page hero to mount before falling back.
+      frameId = requestAnimationFrame(() => {
+        if (cancelled) return;
+        const nextHero = findHero();
+        if (nextHero) {
+          bindHero(nextHero);
+        } else {
+          bindScrollFallback();
+        }
+      });
     }
 
-    // Routes without a hero banner: show after a short scroll.
-    const onScroll = () => setVisible(window.scrollY > 80);
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
+    return () => {
+      cancelled = true;
+      if (frameId) cancelAnimationFrame(frameId);
+      observer?.disconnect();
+      removeScroll?.();
+    };
+  }, [pathname]);
 
   useEffect(() => {
     if (!open) return;
