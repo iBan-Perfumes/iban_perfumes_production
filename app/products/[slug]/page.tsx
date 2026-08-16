@@ -75,7 +75,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
   const related = getRelatedProducts(product.slug, 4);
   const breadcrumbLd = getBreadcrumbJsonLd([
-    { name: 'Home', path: '/home' },
+    { name: 'Home', path: '/' },
     { name: 'Collection', path: '/collection' },
     { name: product.name, path: `/products/${product.slug}` },
   ]);
@@ -97,7 +97,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
         <div className="max-w-7xl mx-auto px-5 sm:px-8 pt-8 sm:pt-12 pb-16 sm:pb-20">
           <Breadcrumb
             items={[
-              { label: 'Home', href: '/home' },
+              { label: 'Home', href: '/' },
               { label: 'Collection', href: '/collection' },
               { label: product.family },
               { label: product.name },

@@ -13,7 +13,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return [
     {
-      url: `${base}/home`,
+      url: `${base}/`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 1,

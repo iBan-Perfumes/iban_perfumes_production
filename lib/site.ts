@@ -16,7 +16,7 @@ export function isIndexingAllowed(): boolean {
 }
 
 export const navLinks = [
-  { label: 'Home', href: '/home' },
+  { label: 'Home', href: '/' },
   { label: 'Collection', href: '/collection' },
   { label: 'About', href: '/about' },
   { label: 'Contact', href: '/contact' },

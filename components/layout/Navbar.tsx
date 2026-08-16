@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Menu, X } from 'lucide-react';
+import { BrandLogo } from '@/components/layout/BrandLogo';
 import { navLinks } from '@/lib/site';
 
 export function Navbar() {
@@ -58,23 +59,12 @@ export function Navbar() {
         aria-label="Primary"
       >
         <Link
-          href="/home"
-          className="inline-flex items-center gap-3"
+          href="/"
+          className="inline-flex items-center"
           aria-label="i-BAN Perfumes home"
         >
-          <span
-            className="grid h-10 w-10 place-items-center overflow-hidden rounded-[12px] border border-stone-200 bg-stone-900 text-[0.68rem] font-bold tracking-wide text-white"
-            aria-hidden="true"
-          >
-            iB
-          </span>
-          <span className="flex flex-col gap-0.5">
-            <span className="text-sm font-bold tracking-wide text-stone-900">
-              i-BAN Perfumes
-            </span>
-            <span className="text-[0.6rem] font-semibold uppercase tracking-[0.16em] text-stone-400">
-              Eau de Parfum
-            </span>
+          <span className="block w-[5.75rem] sm:w-[6.25rem]">
+            <BrandLogo variant="black" tone="dark" size="compact" priority />
           </span>
         </Link>
 

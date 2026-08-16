@@ -36,7 +36,7 @@ export const metadata: Metadata = {
 
 export default function ContactPage() {
   const breadcrumbLd = getBreadcrumbJsonLd([
-    { name: 'Home', path: '/home' },
+    { name: 'Home', path: '/' },
     { name: 'Contact', path: '/contact' },
   ]);
 

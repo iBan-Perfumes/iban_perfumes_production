@@ -60,12 +60,12 @@ export const metadata: Metadata = {
   creator: SITE_NAME,
   publisher: SITE_NAME,
   alternates: {
-    canonical: '/home',
+    canonical: '/',
   },
   openGraph: {
     type: 'website',
     locale: 'en_IN',
-    url: `${siteUrl}/home`,
+    url: siteUrl,
     siteName: SITE_NAME,
     title: `${SITE_NAME} | Luxury Eau de Parfum`,
     description: SITE_DESCRIPTION,
@@ -121,7 +121,7 @@ export default function RootLayout({
       className={`${cormorant.variable} ${jost.variable} ${tenorSans.variable}`}
     >
       <body className="bg-white text-stone-700 overflow-x-hidden antialiased">
-        <Link href="/home" className="skip-link">
+        <Link href="/" className="skip-link">
           Skip to content
         </Link>
         <script

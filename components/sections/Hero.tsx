@@ -10,6 +10,7 @@ import {
 } from 'react';
 import Image from 'next/image';
 import { Menu, X } from 'lucide-react';
+import { BrandLogo } from '@/components/layout/BrandLogo';
 import { cinematicSlides } from '@/lib/cinematic-slides';
 import { navLinks } from '@/lib/site';
 import '@/app/cinematic-carousel.css';
@@ -235,13 +236,9 @@ export function Hero() {
 
       <div className="cc-shell">
         <header className="cc-top-bar">
-          <a href="/home" className="cc-brand" aria-label="i-BAN Perfumes home">
-            <span className="cc-brand-mark" aria-hidden="true">
-              <span>iB</span>
-            </span>
-            <span className="cc-brand-copy">
-              <span className="cc-brand-name">i-BAN Perfumes</span>
-              <span className="cc-brand-tagline">Eau de Parfum</span>
+          <a href="/" className="cc-brand" aria-label="i-BAN Perfumes home">
+            <span className="cc-brand-logo">
+              <BrandLogo variant="transparent" tone="light" size="compact" priority />
             </span>
           </a>
 

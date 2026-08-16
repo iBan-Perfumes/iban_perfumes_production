@@ -40,7 +40,7 @@ export const metadata: Metadata = {
 
 export default function CollectionPage() {
   const breadcrumbLd = getBreadcrumbJsonLd([
-    { name: 'Home', path: '/home' },
+    { name: 'Home', path: '/' },
     { name: 'Collection', path: '/collection' },
   ]);
   const collectionLd = getCollectionPageJsonLd();
