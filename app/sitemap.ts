@@ -1,9 +1,12 @@
 import type { MetadataRoute } from 'next';
-import { catalogProducts } from '@/lib/catalog';
+import { getAvailableProducts } from '@/lib/catalog-db';
 import { getSiteUrl } from '@/lib/site';
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export const dynamic = 'force-dynamic';
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = getSiteUrl();
+  const catalogProducts = await getAvailableProducts();
   const productEntries = catalogProducts.map((p) => ({
     url: `${base}/products/${p.slug}`,
     lastModified: new Date(p.createdAt),

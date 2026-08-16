@@ -3,11 +3,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { featuredPerfumes } from '@/lib/featured-perfumes';
+import type { FeaturedPerfume } from '@/lib/featured-perfumes';
 
 const EDGE = 2;
 
-export function Featured() {
+export function Featured({ items }: { items: FeaturedPerfume[] }) {
   const trackRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
@@ -90,7 +90,7 @@ export function Featured() {
         data-lenis-prevent-horizontal
         className="flex snap-x snap-mandatory gap-6 overflow-x-auto pb-2 pl-5 scrollbar-none scroll-pl-5 sm:pl-8 sm:scroll-pl-8"
       >
-        {featuredPerfumes.map((perfume) => (
+        {items.map((perfume) => (
           <article
             key={perfume.id}
             data-card

@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Reveal } from '@/components/ui/Reveal';
-import { catalogProducts, type CatalogProduct } from '@/lib/catalog';
+import type { CatalogProduct } from '@/lib/catalog-types';
 
 function splitIntoColumns(products: CatalogProduct[], columnCount: number) {
   const columns: CatalogProduct[][] = Array.from({ length: columnCount }, () => []);
@@ -17,10 +17,10 @@ const COLUMN_META = [
   { direction: 'up' as const, durationClass: 'collection-gallery-track--dur-3' },
 ];
 
-export function Collection() {
-  const products = catalogProducts.filter((p) => p.available);
-  const columns = splitIntoColumns(products, 3);
-  const fragranceCount = String(products.length).padStart(2, '0');
+export function Collection({ products }: { products: CatalogProduct[] }) {
+  const available = products.filter((p) => p.available);
+  const columns = splitIntoColumns(available, 3);
+  const fragranceCount = String(available.length).padStart(2, '0');
 
   return (
     <section id="collection" className="collection-section relative overflow-hidden py-28 lg:py-32">

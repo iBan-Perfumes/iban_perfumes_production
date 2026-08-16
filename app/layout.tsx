@@ -108,13 +108,13 @@ export const metadata: Metadata = {
       },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   const organizationLd = getOrganizationJsonLd();
-  const productsLd = getProductListJsonLd();
+  const productsLd = await getProductListJsonLd();
 
   return (
     <html

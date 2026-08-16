@@ -1,5 +1,8 @@
 import { getSiteUrl, SITE_DESCRIPTION, SITE_NAME } from '@/lib/site';
-import { catalogProducts } from '@/lib/catalog';
+import {
+  getAvailableProducts,
+  getProductBySlug,
+} from '@/lib/catalog-db';
 import { aboutPageSeo } from '@/lib/about-content';
 import { collectionPageSeo } from '@/lib/collection-content';
 
@@ -19,8 +22,14 @@ export function getOrganizationJsonLd() {
   };
 }
 
-export function getProductListJsonLd() {
+function absoluteImage(url: string, siteUrl: string) {
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  return `${siteUrl}${url}`;
+}
+
+export async function getProductListJsonLd() {
   const url = getSiteUrl();
+  const catalogProducts = await getAvailableProducts();
   return {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
@@ -32,7 +41,7 @@ export function getProductListJsonLd() {
         '@type': 'Product',
         name: p.name,
         description: p.description,
-        image: `${url}${p.perfumeImage}`,
+        image: absoluteImage(p.perfumeImage, url),
         url: `${url}/products/${p.slug}`,
         brand: {
           '@type': 'Brand',
@@ -89,8 +98,9 @@ export function getAboutPageJsonLd() {
   };
 }
 
-export function getCollectionPageJsonLd() {
+export async function getCollectionPageJsonLd() {
   const url = getSiteUrl();
+  const catalogProducts = await getAvailableProducts();
   return {
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',
@@ -116,8 +126,8 @@ export function getCollectionPageJsonLd() {
   };
 }
 
-export function getProductJsonLd(slug: string) {
-  const product = catalogProducts.find((p) => p.slug === slug);
+export async function getProductJsonLd(slug: string) {
+  const product = await getProductBySlug(slug);
   if (!product) return null;
 
   const url = getSiteUrl();
@@ -126,7 +136,7 @@ export function getProductJsonLd(slug: string) {
     '@type': 'Product',
     name: product.name,
     description: product.description,
-    image: product.gallery.map((g) => `${url}${g.src}`),
+    image: product.gallery.map((g) => absoluteImage(g.src, url)),
     url: `${url}/products/${product.slug}`,
     brand: {
       '@type': 'Brand',

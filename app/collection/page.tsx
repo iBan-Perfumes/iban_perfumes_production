@@ -2,12 +2,15 @@ import type { Metadata } from 'next';
 import { CollectionBrowse } from '@/components/collection/CollectionBrowse';
 import { CollectionCta } from '@/components/collection/CollectionCta';
 import { CollectionHero } from '@/components/collection/CollectionHero';
+import { getAvailableProducts } from '@/lib/catalog-db';
 import { collectionPageSeo } from '@/lib/collection-content';
 import { SITE_NAME } from '@/lib/site';
 import {
   getBreadcrumbJsonLd,
   getCollectionPageJsonLd,
 } from '@/lib/structured-data';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: collectionPageSeo.title,
@@ -38,12 +41,13 @@ export const metadata: Metadata = {
   },
 };
 
-export default function CollectionPage() {
+export default async function CollectionPage() {
+  const products = await getAvailableProducts();
   const breadcrumbLd = getBreadcrumbJsonLd([
     { name: 'Home', path: '/' },
     { name: 'Collection', path: '/collection' },
   ]);
-  const collectionLd = getCollectionPageJsonLd();
+  const collectionLd = await getCollectionPageJsonLd();
 
   return (
     <>
@@ -58,7 +62,7 @@ export default function CollectionPage() {
       <main id="main">
         <article>
           <CollectionHero />
-          <CollectionBrowse />
+          <CollectionBrowse products={products} />
           <CollectionCta />
         </article>
       </main>

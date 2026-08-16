@@ -4,13 +4,8 @@ import { AnimatePresence, LayoutGroup, motion } from 'framer-motion';
 import { ListFilter, SearchX } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { ProductCard } from '@/components/collection/ProductCard';
-import {
-  filterAndSortProducts,
-  getAllCategories,
-  getAllPrices,
-  type CatalogSort,
-  type FragranceCategory,
-} from '@/lib/catalog';
+import { filterAndSortProducts } from '@/lib/catalog-filter';
+import type { CatalogProduct, CatalogSort } from '@/lib/catalog-types';
 
 const SORT_OPTIONS: { value: CatalogSort; label: string }[] = [
   { value: 'featured', label: 'Featured' },
@@ -21,18 +16,32 @@ const SORT_OPTIONS: { value: CatalogSort; label: string }[] = [
   { value: 'name-desc', label: 'Alphabetical Z-A' },
 ];
 
-export function CollectionBrowse() {
-  const categories = useMemo(() => getAllCategories(), []);
-  const prices = useMemo(() => getAllPrices(), []);
+export function CollectionBrowse({
+  products: allProducts,
+}: {
+  products: CatalogProduct[];
+}) {
+  const categories = useMemo(
+    () => Array.from(new Set(allProducts.map((p) => p.category))).sort(),
+    [allProducts]
+  );
+  const prices = useMemo(
+    () =>
+      Array.from(new Set(allProducts.map((p) => p.price))).sort(
+        (a, b) =>
+          Number(a.replace(/[₹,]/g, '')) - Number(b.replace(/[₹,]/g, ''))
+      ),
+    [allProducts]
+  );
 
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const [category, setCategory] = useState<FragranceCategory | 'All'>('All');
+  const [category, setCategory] = useState<string | 'All'>('All');
   const [price, setPrice] = useState<string | 'All'>('All');
   const [sort, setSort] = useState<CatalogSort>('featured');
 
   const products = useMemo(
-    () => filterAndSortProducts({ category, price, sort }),
-    [category, price, sort]
+    () => filterAndSortProducts(allProducts, { category, price, sort }),
+    [allProducts, category, price, sort]
   );
 
   const clearFilters = () => {
