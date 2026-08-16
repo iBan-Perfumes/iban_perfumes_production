@@ -61,6 +61,9 @@ export default async function EditProductPage({
           notePyramid: product.notePyramid,
           thumbnailImageId: product.thumbnailImageId,
           images: product.images,
+          variants: [...product.variants].sort(
+            (a, b) => a.sortOrder - b.sortOrder
+          ),
         }}
       />
     </div>

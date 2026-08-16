@@ -8,6 +8,7 @@ export type {
   FragranceCategory,
   NotePyramid,
   ProductDetails,
+  ProductVariant,
 } from '@/lib/catalog-types';
 
 export { sharedHowToUse, sharedSafety } from '@/lib/catalog-db';

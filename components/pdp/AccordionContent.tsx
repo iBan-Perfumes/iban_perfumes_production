@@ -42,7 +42,6 @@ export function ProductDetailsContent({ product }: { product: CatalogProduct }) 
   const rows: [string, string][] = [
     ['Brand', product.details.brand],
     ['Format', product.details.format],
-    ['Volume', product.details.volume],
     ['Category', categoryList],
     ['Fragrance Family', categoryList],
     ['Character', product.details.character],

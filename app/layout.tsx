@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Cormorant_Garamond, Jost, Tenor_Sans } from 'next/font/google';
+import { Cormorant_Garamond, Jost, Outfit, Tenor_Sans } from 'next/font/google';
 import { StorefrontChrome } from '@/components/layout/StorefrontChrome';
 import { getSiteUrl, isIndexingAllowed, SITE_DESCRIPTION, SITE_NAME } from '@/lib/site';
 import {
@@ -21,6 +21,13 @@ const jost = Jost({
   subsets: ['latin'],
   weight: ['300', '400', '500'],
   variable: '--font-jost',
+  display: 'swap',
+});
+
+const outfit = Outfit({
+  subsets: ['latin'],
+  weight: ['300', '400', '500'],
+  variable: '--font-outfit',
   display: 'swap',
 });
 
@@ -117,7 +124,7 @@ export default async function RootLayout({
   return (
     <html
       lang="en"
-      className={`${cormorant.variable} ${jost.variable} ${tenorSans.variable}`}
+      className={`${cormorant.variable} ${jost.variable} ${outfit.variable} ${tenorSans.variable}`}
     >
       <body className="bg-white text-stone-700 overflow-x-hidden antialiased">
         <Link href="/" className="skip-link">

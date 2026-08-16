@@ -43,7 +43,7 @@ export function Gifting() {
                 </div>
                 <h3 className="font-serif text-2xl text-stone-900 mb-3">{g.title}</h3>
                 <p className="text-stone-500 text-sm leading-relaxed mb-6">{g.text}</p>
-                <p className="text-amber-700 tracking-widest text-sm">{g.price}</p>
+                <p className="font-price text-amber-700 tracking-widest text-sm">{g.price}</p>
               </div>
             </Reveal>
           ))}

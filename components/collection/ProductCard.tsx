@@ -44,7 +44,37 @@ export function ProductCard({ product }: ProductCardProps) {
       <div className="flex flex-1 flex-col p-5">
         <h3 className="font-serif text-xl text-stone-900">{product.name}</h3>
         <p className="mt-1 text-sm text-stone-500">{product.character}</p>
-        <p className="mt-3 text-sm font-medium text-amber-700">{product.price}</p>
+        {product.variants.length > 0 ? (
+          <div className="mt-3">
+            <p className="text-xs text-stone-400">{product.variants[0].name}</p>
+            <p className="mt-0.5 flex flex-wrap items-baseline gap-2">
+              {product.variants[0].offerPrice != null &&
+              product.variants[0].offerPrice > 0 &&
+              product.variants[0].offerPrice < product.variants[0].mrp ? (
+                <>
+                  <span className="font-price text-base font-light tracking-tight text-amber-700">
+                    ₹{product.variants[0].offerPrice}
+                  </span>
+                  <span className="font-price text-xs font-light text-black line-through">
+                    ₹{product.variants[0].mrp}
+                  </span>
+                </>
+              ) : (
+                <span className="font-price text-base font-light tracking-tight text-amber-700">
+                  ₹
+                  {product.variants[0].offerPrice != null &&
+                  product.variants[0].offerPrice > 0
+                    ? product.variants[0].offerPrice
+                    : product.variants[0].mrp}
+                </span>
+              )}
+            </p>
+          </div>
+        ) : (
+          <p className="font-price mt-3 text-base font-light tracking-tight text-amber-700">
+            {product.price}
+          </p>
+        )}
 
         <div className="mt-auto grid grid-cols-2 gap-2 pt-5">
           <Link

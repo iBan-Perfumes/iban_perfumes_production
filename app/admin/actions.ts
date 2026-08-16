@@ -11,7 +11,7 @@ import {
 } from '@/lib/auth';
 import { convertAndUploadWebp, deleteBlobUrl } from '@/lib/blob';
 import { getDb } from '@/lib/db';
-import { categories, productCategories, productImages, products } from '@/lib/db/schema';
+import { categories, productCategories, productImages, productVariants, products } from '@/lib/db/schema';
 import { slugify } from '@/lib/slugify';
 
 function requireAdmin() {
@@ -123,6 +123,72 @@ function parseNotes(value: string): string[] {
     .filter(Boolean);
 }
 
+type ParsedVariant = {
+  name: string;
+  mrp: number;
+  offerPrice: number | null;
+};
+
+function parseVariantsJson(raw: string): {
+  variants: ParsedVariant[];
+  error?: string;
+} {
+  if (!raw.trim()) return { variants: [] };
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    return { variants: [], error: 'Invalid variants data' };
+  }
+  if (!Array.isArray(parsed)) {
+    return { variants: [], error: 'Invalid variants data' };
+  }
+
+  const variants: ParsedVariant[] = [];
+  for (let i = 0; i < parsed.length; i++) {
+    const item = parsed[i] as Record<string, unknown>;
+    const name = String(item?.name ?? '').trim();
+    const mrp = Number(item?.mrp);
+    const offerRaw = item?.offerPrice;
+    const offerPrice =
+      offerRaw === null ||
+      offerRaw === undefined ||
+      offerRaw === '' ||
+      Number.isNaN(Number(offerRaw))
+        ? null
+        : Number(offerRaw);
+
+    if (!name) {
+      return {
+        variants: [],
+        error: `Variant ${i + 1}: name is required`,
+      };
+    }
+    if (!Number.isFinite(mrp) || mrp <= 0) {
+      return {
+        variants: [],
+        error: `Variant ${i + 1}: MRP must be greater than 0`,
+      };
+    }
+    if (offerPrice !== null) {
+      if (!Number.isFinite(offerPrice) || offerPrice <= 0) {
+        return {
+          variants: [],
+          error: `Variant ${i + 1}: offer price must be greater than 0`,
+        };
+      }
+      if (offerPrice > mrp) {
+        return {
+          variants: [],
+          error: 'Offer price cannot be greater than MRP.',
+        };
+      }
+    }
+    variants.push({ name, mrp, offerPrice });
+  }
+  return { variants };
+}
+
 export async function saveProductAction(formData: FormData) {
   await requireAdmin();
   const db = getDb();
@@ -153,6 +219,13 @@ export async function saveProductAction(formData: FormData) {
     heart: parseNotes(String(formData.get('notesHeart') ?? '')),
     base: parseNotes(String(formData.get('notesBase') ?? '')),
   };
+
+  const { variants, error: variantsError } = parseVariantsJson(
+    String(formData.get('variantsJson') ?? '')
+  );
+  if (variantsError) {
+    return { error: variantsError };
+  }
 
   if (
     !name ||
@@ -206,6 +279,21 @@ export async function saveProductAction(formData: FormData) {
       categoryId: cid,
     }))
   );
+
+  await db
+    .delete(productVariants)
+    .where(eq(productVariants.productId, productId));
+  if (variants.length > 0) {
+    await db.insert(productVariants).values(
+      variants.map((v, index) => ({
+        productId,
+        name: v.name,
+        mrp: v.mrp,
+        offerPrice: v.offerPrice,
+        sortOrder: index,
+      }))
+    );
+  }
 
   const files = formData
     .getAll('images')

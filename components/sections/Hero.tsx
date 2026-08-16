@@ -322,19 +322,6 @@ export function Hero() {
                 <span className="cc-title-accent">{slide.titleAccent}</span>
               </h1>
 
-              <ul className="cc-meta-list" aria-label="Fragrance details">
-                {slide.meta.map((item, i) => (
-                  <li
-                    key={item}
-                    className={`cc-meta-item${
-                      i === slide.meta.length - 1 ? ' is-highlighted' : ''
-                    }`}
-                  >
-                    {item}
-                  </li>
-                ))}
-              </ul>
-
               <p className="cc-story-description">{slide.description}</p>
 
               <ul className="cc-genre-list" aria-label="Fragrance notes">

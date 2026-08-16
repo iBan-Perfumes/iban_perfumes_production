@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import type { CatalogProduct } from '@/lib/catalog';
 import {
@@ -8,9 +8,51 @@ import {
   isWhatsAppConfigured,
 } from '@/lib/whatsapp';
 
+function formatRupee(value: number) {
+  return `₹${value}`;
+}
+
+function effectivePrice(mrp: number, offerPrice: number | null | undefined) {
+  return offerPrice != null && offerPrice > 0 ? offerPrice : mrp;
+}
+
 export function BuyBox({ product }: { product: CatalogProduct }) {
+  const hasVariants = product.variants.length > 0;
+  const [selectedId, setSelectedId] = useState(
+    () => product.variants[0]?.id ?? ''
+  );
   const [qty, setQty] = useState(1);
-  const waUrl = getWhatsAppOrderUrl(product.name, qty);
+
+  const selected = useMemo(() => {
+    if (!hasVariants) return null;
+    return (
+      product.variants.find((v) => v.id === selectedId) ?? product.variants[0]
+    );
+  }, [hasVariants, product.variants, selectedId]);
+
+  const unitPrice = selected
+    ? effectivePrice(selected.mrp, selected.offerPrice)
+    : product.priceValue;
+  const total = unitPrice * qty;
+  const showOffer =
+    selected != null &&
+    selected.offerPrice != null &&
+    selected.offerPrice > 0 &&
+    selected.offerPrice < selected.mrp;
+
+  const waUrl = getWhatsAppOrderUrl(
+    product.name,
+    qty,
+    selected
+      ? {
+          variantName: selected.name,
+          unitPrice,
+          total,
+          mrp: selected.mrp,
+          offerPrice: selected.offerPrice,
+        }
+      : undefined
+  );
   const canBuy = isWhatsAppConfigured() && Boolean(waUrl);
 
   const dec = () => setQty((q) => Math.max(1, q - 1));
@@ -18,6 +60,8 @@ export function BuyBox({ product }: { product: CatalogProduct }) {
 
   const buyClassName =
     'inline-flex flex-1 items-center justify-center bg-stone-900 px-8 py-3.5 text-xs tracking-[0.25em] text-white uppercase transition-colors duration-300 hover:bg-amber-700 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-stone-900';
+
+  const volumeLabel = selected?.name ?? product.volume;
 
   return (
     <div className="flex flex-col">
@@ -31,12 +75,74 @@ export function BuyBox({ product }: { product: CatalogProduct }) {
         {product.shortDescription}
       </p>
 
-      <p className="mt-8 font-serif text-2xl text-amber-700">{product.price}</p>
+      {hasVariants && (
+        <div className="mt-8">
+          <p className="text-[11px] tracking-[0.2em] text-stone-400 uppercase">
+            Size
+          </p>
+          <div
+            className="mt-3 flex flex-wrap gap-2"
+            role="group"
+            aria-label="Select size"
+          >
+            {product.variants.map((v) => {
+              const active = (selected?.id ?? '') === v.id;
+              return (
+                <button
+                  key={v.id}
+                  type="button"
+                  onClick={() => setSelectedId(v.id)}
+                  aria-pressed={active}
+                  className={`min-w-[4.5rem] border px-4 py-2.5 text-sm transition-colors ${
+                    active
+                      ? 'border-amber-700 text-amber-800 bg-amber-50'
+                      : 'border-stone-300 text-stone-700 hover:border-stone-500'
+                  }`}
+                >
+                  {v.name}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      <div className="mt-8">
+        {hasVariants && selected ? (
+          <div className="flex flex-wrap items-baseline gap-3">
+            {showOffer ? (
+              <>
+                <span className="font-price text-2xl font-light tracking-tight text-amber-700 sm:text-3xl">
+                  {formatRupee(selected.offerPrice!)}
+                </span>
+                <span className="font-price text-sm font-light text-black line-through sm:text-base">
+                  {formatRupee(selected.mrp)}
+                </span>
+              </>
+            ) : (
+              <span className="font-price text-2xl font-light tracking-tight text-amber-700 sm:text-3xl">
+                {formatRupee(selected.mrp)}
+              </span>
+            )}
+          </div>
+        ) : (
+          <p className="font-price text-2xl font-light tracking-tight text-amber-700 sm:text-3xl">
+            {product.price}
+          </p>
+        )}
+        {qty > 1 && (
+          <p className="font-price mt-2 text-sm text-stone-500">
+            Total {formatRupee(total)}
+          </p>
+        )}
+      </div>
 
       <dl className="mt-8 grid grid-cols-2 gap-x-6 gap-y-4 text-sm border-t border-b border-stone-200 py-6">
         <div>
-          <dt className="text-[11px] tracking-[0.2em] text-stone-400 uppercase">Volume</dt>
-          <dd className="mt-1 text-stone-800">{product.volume}</dd>
+          <dt className="text-[11px] tracking-[0.2em] text-stone-400 uppercase">
+            Volume
+          </dt>
+          <dd className="mt-1 text-stone-800">{volumeLabel}</dd>
         </div>
         <div>
           <dt className="text-[11px] tracking-[0.2em] text-stone-400 uppercase">
@@ -50,7 +156,9 @@ export function BuyBox({ product }: { product: CatalogProduct }) {
           </dd>
         </div>
         <div>
-          <dt className="text-[11px] tracking-[0.2em] text-stone-400 uppercase">Character</dt>
+          <dt className="text-[11px] tracking-[0.2em] text-stone-400 uppercase">
+            Character
+          </dt>
           <dd className="mt-1 text-stone-800">{product.character}</dd>
         </div>
         <div>
@@ -75,7 +183,10 @@ export function BuyBox({ product }: { product: CatalogProduct }) {
           >
             −
           </button>
-          <span className="min-w-[3rem] text-center text-sm tracking-widest" aria-live="polite">
+          <span
+            className="min-w-[3rem] text-center text-sm tracking-widest"
+            aria-live="polite"
+          >
             {qty}
           </span>
           <button

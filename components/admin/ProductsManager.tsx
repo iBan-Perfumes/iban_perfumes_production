@@ -30,6 +30,7 @@ export type AdminProductRow = {
   name: string;
   slug: string;
   priceValue: number;
+  variantCount: number;
   available: boolean;
   featured: boolean;
   updatedAt: string;
@@ -228,7 +229,12 @@ export function ProductsManager({
                           </div>
                           <div className="min-w-0">
                             <p className="flex items-center gap-1.5 font-medium text-stone-900">
-                              <span className="truncate">{row.name}</span>
+                              <Link
+                                href={`/admin/products/${row.id}`}
+                                className="truncate hover:text-amber-800 hover:underline"
+                              >
+                                {row.name}
+                              </Link>
                               {row.featured && (
                                 <Star
                                   className="h-3.5 w-3.5 shrink-0 fill-amber-500 text-amber-500"
@@ -250,6 +256,12 @@ export function ProductsManager({
                       </td>
                       <td className="px-5 py-3 text-stone-700">
                         ₹{row.priceValue}
+                        {row.variantCount > 0 && (
+                          <span className="ml-1.5 text-xs text-stone-400">
+                            · {row.variantCount} variant
+                            {row.variantCount === 1 ? '' : 's'}
+                          </span>
+                        )}
                       </td>
                       <td className="px-5 py-3">
                         <StatusBadge
@@ -360,15 +372,23 @@ export function ProductsManager({
                   <div className="min-w-0 flex-1">
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0">
-                        <p className="truncate font-medium text-stone-900">
+                        <Link
+                          href={`/admin/products/${row.id}`}
+                          className="block truncate font-medium text-stone-900 hover:text-amber-800 hover:underline"
+                        >
                           {row.name}
-                        </p>
+                        </Link>
                         <p className="text-xs text-stone-400">
                           {(row.categoryNames?.length
                             ? row.categoryNames
                             : [row.categoryName]
                           ).join(', ')}{' '}
                           · ₹{row.priceValue}
+                          {row.variantCount > 0
+                            ? ` · ${row.variantCount} variant${
+                                row.variantCount === 1 ? '' : 's'
+                              }`
+                            : ''}
                         </p>
                       </div>
                       <StatusBadge

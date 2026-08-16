@@ -11,6 +11,7 @@ const config: Config = {
         sans: ['var(--font-jost)', 'sans-serif'],
         serif: ['var(--font-cormorant)', 'serif'],
         tenor: ['var(--font-tenor-sans)', 'Tenor Sans', 'sans-serif'],
+        price: ['var(--font-outfit)', 'Outfit', 'sans-serif'],
       },
     },
   },

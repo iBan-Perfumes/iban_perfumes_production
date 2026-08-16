@@ -1,7 +1,7 @@
 'use client';
 
 import { AnimatePresence, LayoutGroup, motion } from 'framer-motion';
-import { ListFilter, SearchX } from 'lucide-react';
+import { ChevronDown, ListFilter, SearchX } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { ProductCard } from '@/components/collection/ProductCard';
 import { filterAndSortProducts } from '@/lib/catalog-filter';
@@ -158,9 +158,34 @@ export function CollectionBrowse({
       </div>
 
       <div className="mx-auto max-w-7xl px-6 pt-8">
+        <div className="mb-10 lg:hidden">
+          <label htmlFor="collection-category" className="sr-only">
+            Fragrance category
+          </label>
+          <div className="relative">
+            <select
+              id="collection-category"
+              value={category}
+              onChange={(e) => setCategory(e.target.value as string | 'All')}
+              className="w-full appearance-none rounded-full border border-stone-300 bg-white py-3 pl-4 pr-11 text-sm uppercase tracking-[0.12em] text-stone-800 outline-none focus:border-amber-700"
+            >
+              <option value="All">All</option>
+              {categories.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
+            <ChevronDown
+              className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-500"
+              aria-hidden
+            />
+          </div>
+        </div>
+
         <LayoutGroup>
           <div
-            className="mb-10 flex flex-wrap gap-2"
+            className="mb-10 hidden flex-wrap gap-2 lg:flex"
             role="tablist"
             aria-label="Fragrance categories"
           >

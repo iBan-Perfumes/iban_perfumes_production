@@ -15,11 +15,21 @@ export default async function AdminProductsPage({
       row.productCategories.length > 0
         ? row.productCategories.map((pc) => pc.category.name)
         : [row.category.name];
+    const variants = [...row.variants].sort(
+      (a, b) => a.sortOrder - b.sortOrder
+    );
+    const first = variants[0];
+    const displayPrice = first
+      ? first.offerPrice != null && first.offerPrice > 0
+        ? first.offerPrice
+        : first.mrp
+      : row.priceValue;
     return {
       id: row.id,
       name: row.name,
       slug: row.slug,
-      priceValue: row.priceValue,
+      priceValue: displayPrice,
+      variantCount: variants.length,
       available: row.available,
       featured: row.featured,
       updatedAt: row.updatedAt.toISOString(),

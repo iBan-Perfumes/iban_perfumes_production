@@ -20,6 +20,13 @@ export interface ProductDetails {
   country: string;
 }
 
+export interface ProductVariant {
+  id: string;
+  name: string;
+  mrp: number;
+  offerPrice: number | null;
+}
+
 export interface CatalogProduct {
   id: string;
   slug: string;
@@ -51,6 +58,8 @@ export interface CatalogProduct {
   gallery: { src: string; alt: string }[];
   details: ProductDetails;
   ingredients: string[];
+  /** Ordered variants; empty = use product-level price */
+  variants: ProductVariant[];
 }
 
 export type CatalogSort =

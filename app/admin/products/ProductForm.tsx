@@ -8,6 +8,7 @@ import {
   ArrowUp,
   ImagePlus,
   Loader2,
+  Plus,
   Star,
   Trash2,
   Upload,
@@ -29,6 +30,12 @@ type ImageRow = {
   alt: string;
   sortOrder: number;
 };
+type VariantDraft = {
+  key: string;
+  name: string;
+  mrp: string;
+  offerPrice: string;
+};
 
 type ProductFormProps = {
   categories: CategoryOption[];
@@ -48,6 +55,13 @@ type ProductFormProps = {
     notePyramid: { top: string[]; heart: string[]; base: string[] };
     thumbnailImageId: string | null;
     images: ImageRow[];
+    variants?: {
+      id: string;
+      name: string;
+      mrp: number;
+      offerPrice: number | null;
+      sortOrder: number;
+    }[];
   };
 };
 
@@ -126,6 +140,20 @@ export function ProductForm({ categories, product }: ProductFormProps) {
   const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>(
     () => product?.categoryIds ?? []
   );
+  const [variants, setVariants] = useState<VariantDraft[]>(() => {
+    const list = product?.variants
+      ? [...product.variants].sort((a, b) => a.sortOrder - b.sortOrder)
+      : [];
+    return list.map((v) => ({
+      key: v.id,
+      name: v.name,
+      mrp: String(v.mrp),
+      offerPrice: v.offerPrice != null ? String(v.offerPrice) : '',
+    }));
+  });
+  const [variantsInvalid, setVariantsInvalid] = useState(false);
+  const [variantsError, setVariantsError] = useState<string | null>(null);
+  const [deleteVariantKey, setDeleteVariantKey] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [invalidFields, setInvalidFields] = useState<Set<RequiredField>>(
     () => new Set()
@@ -136,6 +164,18 @@ export function ProductForm({ categories, product }: ProductFormProps) {
   const [imagePending, startImageTransition] = useTransition();
   const fileRef = useRef<HTMLInputElement>(null);
   const autoSlug = useMemo(() => slugify(name), [name]);
+
+  const variantsJson = useMemo(
+    () =>
+      JSON.stringify(
+        variants.map((v) => ({
+          name: v.name.trim(),
+          mrp: Number(v.mrp),
+          offerPrice: v.offerPrice.trim() === '' ? null : Number(v.offerPrice),
+        }))
+      ),
+    [variants]
+  );
 
   const isInvalid = (field: RequiredField) => invalidFields.has(field);
 
@@ -156,6 +196,42 @@ export function ProductForm({ categories, product }: ProductFormProps) {
       if (next.length > 0) clearInvalid('categoryIds');
       return next;
     });
+  };
+
+  const updateVariant = (
+    key: string,
+    patch: Partial<Omit<VariantDraft, 'key'>>
+  ) => {
+    setVariants((prev) =>
+      prev.map((v) => (v.key === key ? { ...v, ...patch } : v))
+    );
+    setVariantsInvalid(false);
+    setVariantsError(null);
+  };
+
+  const moveVariant = (key: string, direction: 'up' | 'down') => {
+    setVariants((prev) => {
+      const index = prev.findIndex((v) => v.key === key);
+      const swapWith = direction === 'up' ? index - 1 : index + 1;
+      if (index < 0 || swapWith < 0 || swapWith >= prev.length) return prev;
+      const next = [...prev];
+      [next[index], next[swapWith]] = [next[swapWith], next[index]];
+      return next;
+    });
+  };
+
+  const addVariant = () => {
+    setVariants((prev) => [
+      ...prev,
+      {
+        key: `new-${Date.now()}-${prev.length}`,
+        name: '',
+        mrp: '',
+        offerPrice: '',
+      },
+    ]);
+    setVariantsInvalid(false);
+    setVariantsError(null);
   };
 
   const applyFiles = (files: FileList | File[] | null) => {
@@ -179,6 +255,44 @@ export function ProductForm({ categories, product }: ProductFormProps) {
     });
   };
 
+  const validateVariants = () => {
+    for (let i = 0; i < variants.length; i++) {
+      const v = variants[i];
+      const nameValue = v.name.trim();
+      const mrp = Number(v.mrp);
+      const offerRaw = v.offerPrice.trim();
+      const offerPrice = offerRaw === '' ? null : Number(offerRaw);
+
+      if (!nameValue) {
+        setVariantsInvalid(true);
+        setVariantsError(`Variant ${i + 1}: name is required`);
+        return false;
+      }
+      if (!Number.isFinite(mrp) || mrp <= 0) {
+        setVariantsInvalid(true);
+        setVariantsError(`Variant ${i + 1}: MRP must be greater than 0`);
+        return false;
+      }
+      if (offerPrice !== null) {
+        if (!Number.isFinite(offerPrice) || offerPrice <= 0) {
+          setVariantsInvalid(true);
+          setVariantsError(
+            `Variant ${i + 1}: offer price must be greater than 0`
+          );
+          return false;
+        }
+        if (offerPrice > mrp) {
+          setVariantsInvalid(true);
+          setVariantsError('Offer price cannot be greater than MRP.');
+          return false;
+        }
+      }
+    }
+    setVariantsInvalid(false);
+    setVariantsError(null);
+    return true;
+  };
+
   const validateForm = (form: HTMLFormElement) => {
     const fd = new FormData(form);
     const next = new Set<RequiredField>();
@@ -200,7 +314,8 @@ export function ProductForm({ categories, product }: ProductFormProps) {
     else next.delete('categoryIds');
 
     setInvalidFields(next);
-    return next.size === 0;
+    const variantsOk = validateVariants();
+    return next.size === 0 && variantsOk;
   };
 
   return (
@@ -238,6 +353,7 @@ export function ProductForm({ categories, product }: ProductFormProps) {
         }}
       >
         {product && <input type="hidden" name="id" value={product.id} />}
+        <input type="hidden" name="variantsJson" value={variantsJson} />
 
         <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_20rem]">
           <div className="space-y-6">
@@ -462,6 +578,131 @@ export function ProductForm({ categories, product }: ProductFormProps) {
             </AdminCard>
 
             <AdminCard
+              title="Product Variants"
+              description="Optional sizes with their own MRP and offer price. Leave empty to use the base price only."
+            >
+              <div
+                className={`overflow-hidden rounded-xl border ${
+                  variantsInvalid
+                    ? 'border-red-500 ring-1 ring-red-200'
+                    : 'border-stone-200'
+                }`}
+              >
+                {variants.length === 0 ? (
+                  <p className="px-4 py-6 text-center text-sm text-stone-500">
+                    No variants yet. Add sizes like 20ml, 50ml, 100ml.
+                  </p>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full min-w-[560px] text-left text-sm">
+                      <thead className="border-b border-stone-100 bg-stone-50/80 text-[11px] uppercase tracking-[0.12em] text-stone-500">
+                        <tr>
+                          <th className="px-3 py-2.5 font-medium">Variant</th>
+                          <th className="px-3 py-2.5 font-medium">MRP (₹)</th>
+                          <th className="px-3 py-2.5 font-medium">
+                            Offer Price (₹)
+                          </th>
+                          <th className="px-3 py-2.5 font-medium">
+                            <span className="sr-only">Actions</span>
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {variants.map((v, index) => (
+                          <tr
+                            key={v.key}
+                            className="border-b border-stone-100 last:border-0"
+                          >
+                            <td className="px-3 py-2">
+                              <input
+                                value={v.name}
+                                onChange={(e) =>
+                                  updateVariant(v.key, { name: e.target.value })
+                                }
+                                placeholder="20ml"
+                                aria-label={`Variant ${index + 1} name`}
+                                className="w-full rounded-lg border border-stone-200 bg-white px-2.5 py-1.5 text-sm outline-none focus:border-amber-700"
+                              />
+                            </td>
+                            <td className="px-3 py-2">
+                              <input
+                                type="number"
+                                min={1}
+                                value={v.mrp}
+                                onChange={(e) =>
+                                  updateVariant(v.key, { mrp: e.target.value })
+                                }
+                                placeholder="120"
+                                aria-label={`Variant ${index + 1} MRP`}
+                                className="w-full rounded-lg border border-stone-200 bg-white px-2.5 py-1.5 text-sm outline-none focus:border-amber-700"
+                              />
+                            </td>
+                            <td className="px-3 py-2">
+                              <input
+                                type="number"
+                                min={1}
+                                value={v.offerPrice}
+                                onChange={(e) =>
+                                  updateVariant(v.key, {
+                                    offerPrice: e.target.value,
+                                  })
+                                }
+                                placeholder="Optional"
+                                aria-label={`Variant ${index + 1} offer price`}
+                                className="w-full rounded-lg border border-stone-200 bg-white px-2.5 py-1.5 text-sm outline-none focus:border-amber-700"
+                              />
+                            </td>
+                            <td className="px-3 py-2">
+                              <div className="flex items-center justify-end gap-1">
+                                <button
+                                  type="button"
+                                  aria-label="Move variant up"
+                                  disabled={index === 0}
+                                  className="rounded p-1.5 text-stone-500 hover:bg-stone-100 disabled:opacity-40"
+                                  onClick={() => moveVariant(v.key, 'up')}
+                                >
+                                  <ArrowUp className="h-3.5 w-3.5" />
+                                </button>
+                                <button
+                                  type="button"
+                                  aria-label="Move variant down"
+                                  disabled={index === variants.length - 1}
+                                  className="rounded p-1.5 text-stone-500 hover:bg-stone-100 disabled:opacity-40"
+                                  onClick={() => moveVariant(v.key, 'down')}
+                                >
+                                  <ArrowDown className="h-3.5 w-3.5" />
+                                </button>
+                                <button
+                                  type="button"
+                                  aria-label="Delete variant"
+                                  className="rounded p-1.5 text-red-600 hover:bg-red-50"
+                                  onClick={() => setDeleteVariantKey(v.key)}
+                                >
+                                  <Trash2 className="h-3.5 w-3.5" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+              {variantsError && (
+                <p className="mt-2 text-xs text-red-600">{variantsError}</p>
+              )}
+              <button
+                type="button"
+                onClick={addVariant}
+                className={`${primaryButtonClassName()} mt-4 !bg-white !text-stone-900 ring-1 ring-stone-200 hover:!bg-stone-50`}
+              >
+                <Plus className="h-4 w-4" aria-hidden />
+                Add Variant
+              </button>
+            </AdminCard>
+
+            <AdminCard
               title="Product Images"
               description="Upload multiple images at once. Each file is converted to WebP before saving."
             >
@@ -520,7 +761,7 @@ export function ProductForm({ categories, product }: ProductFormProps) {
             <AdminCard title="Pricing">
               <label className="block text-sm">
                 <span className="font-medium text-stone-700">
-                  Price (₹)
+                  Base price (₹)
                   <RequiredMark />
                 </span>
                 <input
@@ -539,6 +780,9 @@ export function ProductForm({ categories, product }: ProductFormProps) {
                   }}
                   className={fieldClass(isInvalid('priceValue'))}
                 />
+                <p className="mt-1.5 text-xs text-stone-500">
+                  Used when the product has no variants.
+                </p>
                 <FieldError show={isInvalid('priceValue')} />
               </label>
             </AdminCard>
@@ -697,6 +941,27 @@ export function ProductForm({ categories, product }: ProductFormProps) {
         onConfirm={() => {
           if (!deleteImageId) return;
           runImageAction(deleteProductImageAction, { imageId: deleteImageId });
+        }}
+      />
+
+      <ConfirmDialog
+        open={Boolean(deleteVariantKey)}
+        title="Delete variant?"
+        description={
+          deleteVariantKey
+            ? `Are you sure you want to remove the ${
+                variants.find((v) => v.key === deleteVariantKey)?.name.trim() ||
+                'selected'
+              } variant?`
+            : 'Are you sure you want to remove this variant?'
+        }
+        confirmLabel="Delete"
+        pending={false}
+        onCancel={() => setDeleteVariantKey(null)}
+        onConfirm={() => {
+          if (!deleteVariantKey) return;
+          setVariants((prev) => prev.filter((v) => v.key !== deleteVariantKey));
+          setDeleteVariantKey(null);
         }}
       />
     </div>

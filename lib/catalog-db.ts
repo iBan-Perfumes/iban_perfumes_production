@@ -14,9 +14,16 @@ import type {
   FragranceCategory,
   NotePyramid,
   ProductDetails,
+  ProductVariant,
 } from '@/lib/catalog-types';
 
-export type { CatalogProduct, CatalogSort, FragranceCategory, NotePyramid };
+export type {
+  CatalogProduct,
+  CatalogSort,
+  FragranceCategory,
+  NotePyramid,
+  ProductVariant,
+};
 
 export const sharedHowToUse = [
   'Spray on pulse points — wrists, neck, and behind the ears.',
@@ -41,6 +48,30 @@ function formatPrice(value: number) {
   return `₹${value}`;
 }
 
+function mapVariants(
+  rows?: {
+    id: string;
+    name: string;
+    mrp: number;
+    offerPrice: number | null;
+    sortOrder: number;
+  }[]
+): ProductVariant[] {
+  if (!rows?.length) return [];
+  return [...rows]
+    .sort((a, b) => a.sortOrder - b.sortOrder)
+    .map((v) => ({
+      id: v.id,
+      name: v.name,
+      mrp: v.mrp,
+      offerPrice: v.offerPrice,
+    }));
+}
+
+function effectiveVariantPrice(v: ProductVariant) {
+  return v.offerPrice != null && v.offerPrice > 0 ? v.offerPrice : v.mrp;
+}
+
 function enrichRow(row: {
   id: string;
   slug: string;
@@ -59,6 +90,13 @@ function enrichRow(row: {
   createdAt: Date;
   thumbnailImageId: string | null;
   images: { id: string; url: string; alt: string; sortOrder: number }[];
+  variants?: {
+    id: string;
+    name: string;
+    mrp: number;
+    offerPrice: number | null;
+    sortOrder: number;
+  }[];
 }): CatalogProduct {
   const sortedImages = [...row.images].sort(
     (a, b) => a.sortOrder - b.sortOrder
@@ -78,7 +116,12 @@ function enrichRow(row: {
 
   const notePyramid = row.notePyramid as NotePyramid;
   const flatNotes = flattenNotes(notePyramid);
-  const volume = '20 ML';
+  const variants = mapVariants(row.variants);
+  const defaultVariant = variants[0];
+  const priceValue = defaultVariant
+    ? effectiveVariantPrice(defaultVariant)
+    : row.priceValue;
+  const volume = defaultVariant?.name ?? '20 ML';
   const concentration = 'EDP';
   const categoryNames =
     row.categoryNames.length > 0
@@ -118,8 +161,8 @@ function enrichRow(row: {
     character: row.character,
     category,
     categories: categoryNames,
-    price: formatPrice(row.priceValue),
-    priceValue: row.priceValue,
+    price: formatPrice(priceValue),
+    priceValue,
     badge: row.badge ?? undefined,
     perfumeImage: thumbUrl,
     notesImage: notesImg?.url ?? thumbUrl,
@@ -140,6 +183,7 @@ function enrichRow(row: {
     gallery,
     details,
     ingredients: flatNotes,
+    variants,
   };
 }
 
@@ -171,6 +215,13 @@ function toCatalogProduct(r: {
   category: { name: string };
   images: { id: string; url: string; alt: string; sortOrder: number }[];
   productCategories?: { category: { name: string } }[];
+  variants?: {
+    id: string;
+    name: string;
+    mrp: number;
+    offerPrice: number | null;
+    sortOrder: number;
+  }[];
 }): CatalogProduct {
   return enrichRow({
     id: r.id,
@@ -190,6 +241,7 @@ function toCatalogProduct(r: {
     createdAt: r.createdAt,
     thumbnailImageId: r.thumbnailImageId,
     images: r.images,
+    variants: r.variants,
   });
 }
 
@@ -206,6 +258,7 @@ async function loadProducts(opts?: { availableOnly?: boolean }) {
         productCategories: {
           with: { category: true },
         },
+        variants: true,
       },
       orderBy: [desc(products.featured), desc(products.createdAt)],
     });
@@ -242,6 +295,7 @@ export async function getProductBySlug(
         productCategories: {
           with: { category: true },
         },
+        variants: true,
       },
     });
     if (!row) return undefined;
@@ -379,6 +433,7 @@ export async function listProductsAdmin() {
       productCategories: {
         with: { category: true },
       },
+      variants: true,
       images: {
         orderBy: [asc(productImages.sortOrder)],
       },
@@ -396,6 +451,7 @@ export async function getProductAdmin(id: string) {
       productCategories: {
         with: { category: true },
       },
+      variants: true,
       images: {
         orderBy: [asc(productImages.sortOrder)],
       },

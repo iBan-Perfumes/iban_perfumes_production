@@ -74,6 +74,19 @@ export const productCategories = pgTable(
   (table) => [unique('product_categories_product_category_unique').on(table.productId, table.categoryId)]
 );
 
+export const productVariants = pgTable('product_variants', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  productId: uuid('product_id')
+    .notNull()
+    .references(() => products.id, { onDelete: 'cascade' }),
+  name: text('name').notNull(),
+  mrp: integer('mrp').notNull(),
+  offerPrice: integer('offer_price'),
+  sortOrder: integer('sort_order').notNull().default(0),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
 export const categoriesRelations = relations(categories, ({ many }) => ({
   products: many(products),
   productCategories: many(productCategories),
@@ -86,6 +99,7 @@ export const productsRelations = relations(products, ({ one, many }) => ({
   }),
   images: many(productImages),
   productCategories: many(productCategories),
+  variants: many(productVariants),
 }));
 
 export const productImagesRelations = relations(productImages, ({ one }) => ({
@@ -109,7 +123,18 @@ export const productCategoriesRelations = relations(
   })
 );
 
+export const productVariantsRelations = relations(
+  productVariants,
+  ({ one }) => ({
+    product: one(products, {
+      fields: [productVariants.productId],
+      references: [products.id],
+    }),
+  })
+);
+
 export type Category = typeof categories.$inferSelect;
 export type Product = typeof products.$inferSelect;
 export type ProductImage = typeof productImages.$inferSelect;
 export type ProductCategory = typeof productCategories.$inferSelect;
+export type ProductVariantRow = typeof productVariants.$inferSelect;
