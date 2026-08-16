@@ -42,9 +42,6 @@ export function ProductCard({ product }: ProductCardProps) {
       </div>
 
       <div className="flex flex-1 flex-col p-5">
-        <p className="mb-1 text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-amber-700">
-          {product.category}
-        </p>
         <h3 className="font-serif text-xl text-stone-900">{product.name}</h3>
         <p className="mt-1 text-sm text-stone-500">{product.character}</p>
         <p className="mt-3 text-sm font-medium text-amber-700">{product.price}</p>

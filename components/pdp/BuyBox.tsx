@@ -42,7 +42,12 @@ export function BuyBox({ product }: { product: CatalogProduct }) {
           <dt className="text-[11px] tracking-[0.2em] text-stone-400 uppercase">
             Fragrance Family
           </dt>
-          <dd className="mt-1 text-stone-800">{product.family}</dd>
+          <dd className="mt-1 text-stone-800">
+            {(product.categories?.length
+              ? product.categories
+              : [product.family]
+            ).join(', ')}
+          </dd>
         </div>
         <div>
           <dt className="text-[11px] tracking-[0.2em] text-stone-400 uppercase">Character</dt>

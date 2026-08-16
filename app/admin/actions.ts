@@ -11,7 +11,7 @@ import {
 } from '@/lib/auth';
 import { convertAndUploadWebp, deleteBlobUrl } from '@/lib/blob';
 import { getDb } from '@/lib/db';
-import { categories, productImages, products } from '@/lib/db/schema';
+import { categories, productCategories, productImages, products } from '@/lib/db/schema';
 import { slugify } from '@/lib/slugify';
 
 function requireAdmin() {
@@ -68,6 +68,7 @@ export async function createCategoryAction(formData: FormData): Promise<void> {
 
   revalidateStorefront();
   revalidatePath('/admin/categories');
+  redirect('/admin/categories?toast=category-created');
 }
 
 export async function updateCategoryAction(formData: FormData): Promise<void> {
@@ -88,6 +89,7 @@ export async function updateCategoryAction(formData: FormData): Promise<void> {
 
   revalidateStorefront();
   revalidatePath('/admin/categories');
+  redirect('/admin/categories?toast=category-updated');
 }
 
 export async function deleteCategoryAction(formData: FormData): Promise<void> {
@@ -96,15 +98,22 @@ export async function deleteCategoryAction(formData: FormData): Promise<void> {
   if (!id) return;
 
   const db = getDb();
-  const linked = await db.query.products.findFirst({
+  const linkedProduct = await db.query.products.findFirst({
     where: eq(products.categoryId, id),
     columns: { id: true },
   });
-  if (linked) return;
+  if (linkedProduct) return;
+
+  const linkedJoin = await db.query.productCategories.findFirst({
+    where: eq(productCategories.categoryId, id),
+    columns: { id: true },
+  });
+  if (linkedJoin) return;
 
   await db.delete(categories).where(eq(categories.id, id));
   revalidateStorefront();
   revalidatePath('/admin/categories');
+  redirect('/admin/categories?toast=category-deleted');
 }
 
 function parseNotes(value: string): string[] {
@@ -124,7 +133,15 @@ export async function saveProductAction(formData: FormData) {
   slug = slugify(slug);
   const description = String(formData.get('description') ?? '').trim();
   const character = String(formData.get('character') ?? '').trim();
-  const categoryId = String(formData.get('categoryId') ?? '');
+  const categoryIds = Array.from(
+    new Set(
+      formData
+        .getAll('categoryIds')
+        .map((v) => String(v).trim())
+        .filter(Boolean)
+    )
+  );
+  const categoryId = categoryIds[0] ?? '';
   const priceValue = Number(formData.get('priceValue') ?? 0);
   const badge = String(formData.get('badge') ?? '').trim() || null;
   const heroCopy = String(formData.get('heroCopy') ?? '').trim();
@@ -137,7 +154,14 @@ export async function saveProductAction(formData: FormData) {
     base: parseNotes(String(formData.get('notesBase') ?? '')),
   };
 
-  if (!name || !description || !character || !categoryId || !heroCopy || !story) {
+  if (
+    !name ||
+    !description ||
+    !character ||
+    categoryIds.length === 0 ||
+    !heroCopy ||
+    !story
+  ) {
     return { error: 'Please fill all required fields' };
   }
   if (!Number.isFinite(priceValue) || priceValue <= 0) {
@@ -172,6 +196,16 @@ export async function saveProductAction(formData: FormData) {
   } catch {
     return { error: 'Could not save product (slug may already exist)' };
   }
+
+  await db
+    .delete(productCategories)
+    .where(eq(productCategories.productId, productId));
+  await db.insert(productCategories).values(
+    categoryIds.map((cid) => ({
+      productId,
+      categoryId: cid,
+    }))
+  );
 
   const files = formData
     .getAll('images')
@@ -223,7 +257,7 @@ export async function saveProductAction(formData: FormData) {
 
   revalidateStorefront(slug);
   revalidatePath('/admin/products');
-  redirect(`/admin/products/${productId}`);
+  redirect(`/admin/products/${productId}?toast=product-saved`);
 }
 
 export async function deleteProductAction(formData: FormData): Promise<void> {
@@ -245,6 +279,7 @@ export async function deleteProductAction(formData: FormData): Promise<void> {
   await db.delete(products).where(eq(products.id, id));
   revalidateStorefront(product.slug);
   revalidatePath('/admin/products');
+  redirect('/admin/products?toast=product-deleted');
 }
 
 export async function setThumbnailAction(formData: FormData): Promise<void> {

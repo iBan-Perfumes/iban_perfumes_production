@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import { eq } from 'drizzle-orm';
 import { getDb } from '../lib/db';
-import { categories, productImages, products } from '../lib/db/schema';
+import { categories, productCategories, productImages, products } from '../lib/db/schema';
 import { seedProducts } from '../lib/db/seed-data';
 import { slugify } from '../lib/slugify';
 
@@ -111,6 +111,11 @@ async function main() {
         .set({ thumbnailImageId: thumb.id })
         .where(eq(products.id, product.id));
     }
+
+    await db.insert(productCategories).values({
+      productId: product.id,
+      categoryId,
+    });
 
     console.log(`  seeded: ${item.slug}`);
   }

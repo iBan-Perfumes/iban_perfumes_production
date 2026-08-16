@@ -1,6 +1,10 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ProductForm } from '@/app/admin/products/ProductForm';
+import {
+  PageHeader,
+  secondaryButtonClassName,
+} from '@/components/admin/ui';
 import { getProductAdmin, listCategoriesAdmin } from '@/lib/catalog-db';
 
 export default async function EditProductPage({
@@ -16,16 +20,26 @@ export default async function EditProductPage({
   if (!product) notFound();
 
   return (
-    <div className="rounded-2xl border border-stone-200 bg-white p-6 md:p-8">
-      <div className="mb-6 flex items-center justify-between gap-4">
-        <h1 className="font-tenor text-3xl text-stone-900">Edit {product.name}</h1>
-        <Link
-          href={`/products/${product.slug}`}
-          className="text-sm text-amber-800 hover:underline"
-        >
-          View on site
-        </Link>
-      </div>
+    <div className="space-y-6">
+      <PageHeader
+        title={`Edit ${product.name}`}
+        description="Update product details, publishing, and gallery images."
+        actions={
+          <>
+            <a
+              href={`/products/${product.slug}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={secondaryButtonClassName()}
+            >
+              View on site
+            </a>
+            <Link href="/admin/products" className={secondaryButtonClassName()}>
+              Back
+            </Link>
+          </>
+        }
+      />
       <ProductForm
         categories={categories.map((c) => ({ id: c.id, name: c.name }))}
         product={{
@@ -34,7 +48,10 @@ export default async function EditProductPage({
           slug: product.slug,
           description: product.description,
           character: product.character,
-          categoryId: product.categoryId,
+          categoryIds:
+            product.productCategories.length > 0
+              ? product.productCategories.map((pc) => pc.categoryId)
+              : [product.categoryId],
           priceValue: product.priceValue,
           badge: product.badge,
           heroCopy: product.heroCopy,

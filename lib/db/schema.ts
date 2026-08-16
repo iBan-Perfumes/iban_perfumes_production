@@ -5,6 +5,7 @@ import {
   pgTable,
   text,
   timestamp,
+  unique,
   uuid,
 } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
@@ -30,6 +31,7 @@ export const products = pgTable('products', {
   name: text('name').notNull(),
   description: text('description').notNull(),
   character: text('character').notNull(),
+  /** Primary category (first selected); kept for storefront single-category fields */
   categoryId: uuid('category_id')
     .notNull()
     .references(() => categories.id, { onDelete: 'restrict' }),
@@ -57,8 +59,24 @@ export const productImages = pgTable('product_images', {
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
+export const productCategories = pgTable(
+  'product_categories',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    productId: uuid('product_id')
+      .notNull()
+      .references(() => products.id, { onDelete: 'cascade' }),
+    categoryId: uuid('category_id')
+      .notNull()
+      .references(() => categories.id, { onDelete: 'restrict' }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [unique('product_categories_product_category_unique').on(table.productId, table.categoryId)]
+);
+
 export const categoriesRelations = relations(categories, ({ many }) => ({
   products: many(products),
+  productCategories: many(productCategories),
 }));
 
 export const productsRelations = relations(products, ({ one, many }) => ({
@@ -67,6 +85,7 @@ export const productsRelations = relations(products, ({ one, many }) => ({
     references: [categories.id],
   }),
   images: many(productImages),
+  productCategories: many(productCategories),
 }));
 
 export const productImagesRelations = relations(productImages, ({ one }) => ({
@@ -76,6 +95,21 @@ export const productImagesRelations = relations(productImages, ({ one }) => ({
   }),
 }));
 
+export const productCategoriesRelations = relations(
+  productCategories,
+  ({ one }) => ({
+    product: one(products, {
+      fields: [productCategories.productId],
+      references: [products.id],
+    }),
+    category: one(categories, {
+      fields: [productCategories.categoryId],
+      references: [categories.id],
+    }),
+  })
+);
+
 export type Category = typeof categories.$inferSelect;
 export type Product = typeof products.$inferSelect;
 export type ProductImage = typeof productImages.$inferSelect;
+export type ProductCategory = typeof productCategories.$inferSelect;

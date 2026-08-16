@@ -11,7 +11,11 @@ export function filterAndSortProducts(
   let list = products.filter((p) => p.available);
 
   if (options.category && options.category !== 'All') {
-    list = list.filter((p) => p.category === options.category);
+    list = list.filter((p) =>
+      (p.categories?.length ? p.categories : [p.category]).includes(
+        options.category as string
+      )
+    );
   }
   if (options.price && options.price !== 'All') {
     list = list.filter((p) => p.price === options.price);

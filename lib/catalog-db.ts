@@ -48,6 +48,7 @@ function enrichRow(row: {
   description: string;
   character: string;
   categoryName: string;
+  categoryNames: string[];
   priceValue: number;
   badge: string | null;
   notePyramid: NotePyramidJson;
@@ -79,7 +80,13 @@ function enrichRow(row: {
   const flatNotes = flattenNotes(notePyramid);
   const volume = '20 ML';
   const concentration = 'EDP';
-  const category = row.categoryName as FragranceCategory;
+  const categoryNames =
+    row.categoryNames.length > 0
+      ? row.categoryNames
+      : row.categoryName
+        ? [row.categoryName]
+        : [];
+  const category = (categoryNames[0] ?? row.categoryName) as FragranceCategory;
 
   const gallery = sortedImages.map((img) => ({
     src: img.url,
@@ -110,6 +117,7 @@ function enrichRow(row: {
     description: row.description,
     character: row.character,
     category,
+    categories: categoryNames,
     price: formatPrice(row.priceValue),
     priceValue: row.priceValue,
     badge: row.badge ?? undefined,
@@ -135,6 +143,56 @@ function enrichRow(row: {
   };
 }
 
+function categoryNamesFromRow(row: {
+  category: { name: string };
+  productCategories?: { category: { name: string } }[];
+}) {
+  const fromJoin =
+    row.productCategories?.map((pc) => pc.category.name).filter(Boolean) ?? [];
+  if (fromJoin.length > 0) return fromJoin;
+  return row.category?.name ? [row.category.name] : [];
+}
+
+function toCatalogProduct(r: {
+  id: string;
+  slug: string;
+  name: string;
+  description: string;
+  character: string;
+  priceValue: number;
+  badge: string | null;
+  notePyramid: NotePyramidJson;
+  heroCopy: string;
+  story: string;
+  available: boolean;
+  featured: boolean;
+  createdAt: Date;
+  thumbnailImageId: string | null;
+  category: { name: string };
+  images: { id: string; url: string; alt: string; sortOrder: number }[];
+  productCategories?: { category: { name: string } }[];
+}): CatalogProduct {
+  return enrichRow({
+    id: r.id,
+    slug: r.slug,
+    name: r.name,
+    description: r.description,
+    character: r.character,
+    categoryName: r.category.name,
+    categoryNames: categoryNamesFromRow(r),
+    priceValue: r.priceValue,
+    badge: r.badge,
+    notePyramid: r.notePyramid,
+    heroCopy: r.heroCopy,
+    story: r.story,
+    available: r.available,
+    featured: r.featured,
+    createdAt: r.createdAt,
+    thumbnailImageId: r.thumbnailImageId,
+    images: r.images,
+  });
+}
+
 async function loadProducts(opts?: { availableOnly?: boolean }) {
   noStore();
   if (!process.env.DATABASE_URL) return [];
@@ -145,32 +203,16 @@ async function loadProducts(opts?: { availableOnly?: boolean }) {
       with: {
         category: true,
         images: true,
+        productCategories: {
+          with: { category: true },
+        },
       },
       orderBy: [desc(products.featured), desc(products.createdAt)],
     });
 
     return rows
       .filter((r) => (opts?.availableOnly ? r.available : true))
-      .map((r) =>
-        enrichRow({
-          id: r.id,
-          slug: r.slug,
-          name: r.name,
-          description: r.description,
-          character: r.character,
-          categoryName: r.category.name,
-          priceValue: r.priceValue,
-          badge: r.badge,
-          notePyramid: r.notePyramid,
-          heroCopy: r.heroCopy,
-          story: r.story,
-          available: r.available,
-          featured: r.featured,
-          createdAt: r.createdAt,
-          thumbnailImageId: r.thumbnailImageId,
-          images: r.images,
-        })
-      );
+      .map((r) => toCatalogProduct(r));
   } catch {
     return [];
   }
@@ -194,27 +236,16 @@ export async function getProductBySlug(
     const db = getDb();
     const row = await db.query.products.findFirst({
       where: eq(products.slug, slug),
-      with: { category: true, images: true },
+      with: {
+        category: true,
+        images: true,
+        productCategories: {
+          with: { category: true },
+        },
+      },
     });
     if (!row) return undefined;
-    return enrichRow({
-      id: row.id,
-      slug: row.slug,
-      name: row.name,
-      description: row.description,
-      character: row.character,
-      categoryName: row.category.name,
-      priceValue: row.priceValue,
-      badge: row.badge,
-      notePyramid: row.notePyramid,
-      heroCopy: row.heroCopy,
-      story: row.story,
-      available: row.available,
-      featured: row.featured,
-      createdAt: row.createdAt,
-      thumbnailImageId: row.thumbnailImageId,
-      images: row.images,
-    });
+    return toCatalogProduct(row);
   } catch {
     return undefined;
   }
@@ -229,9 +260,11 @@ export async function getRelatedProducts(
   if (!current) return all.slice(0, limit);
 
   const others = all.filter((p) => p.slug !== slug);
-  const sameCategory = others.filter((p) => p.category === current.category);
+  const sameCategory = others.filter((p) =>
+    p.categories.some((c) => current.categories.includes(c))
+  );
   const rest = others
-    .filter((p) => p.category !== current.category)
+    .filter((p) => !p.categories.some((c) => current.categories.includes(c)))
     .sort((a, b) => Number(b.featured) - Number(a.featured));
 
   return [...sameCategory, ...rest].slice(0, limit);
@@ -264,7 +297,7 @@ export async function queryCatalog(options: {
   let list = await getAvailableProducts();
 
   if (options.category) {
-    list = list.filter((p) => p.category === options.category);
+    list = list.filter((p) => p.categories.includes(options.category!));
   }
   if (options.price) {
     list = list.filter((p) => p.price === options.price);
@@ -331,6 +364,7 @@ export async function listCategoriesAdmin() {
     orderBy: [asc(categories.sortOrder), asc(categories.name)],
     with: {
       products: { columns: { id: true } },
+      productCategories: { columns: { id: true, productId: true } },
     },
   });
 }
@@ -342,6 +376,9 @@ export async function listProductsAdmin() {
     orderBy: [desc(products.updatedAt)],
     with: {
       category: true,
+      productCategories: {
+        with: { category: true },
+      },
       images: {
         orderBy: [asc(productImages.sortOrder)],
       },
@@ -356,6 +393,9 @@ export async function getProductAdmin(id: string) {
     where: eq(products.id, id),
     with: {
       category: true,
+      productCategories: {
+        with: { category: true },
+      },
       images: {
         orderBy: [asc(productImages.sortOrder)],
       },

@@ -22,7 +22,14 @@ export function CollectionBrowse({
   products: CatalogProduct[];
 }) {
   const categories = useMemo(
-    () => Array.from(new Set(allProducts.map((p) => p.category))).sort(),
+    () =>
+      Array.from(
+        new Set(
+          allProducts.flatMap((p) =>
+            p.categories?.length ? p.categories : [p.category]
+          )
+        )
+      ).sort(),
     [allProducts]
   );
   const prices = useMemo(

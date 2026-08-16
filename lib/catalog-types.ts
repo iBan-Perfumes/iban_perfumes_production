@@ -27,6 +27,8 @@ export interface CatalogProduct {
   description: string;
   character: string;
   category: FragranceCategory;
+  /** All assigned category names (filters match any) */
+  categories: FragranceCategory[];
   price: string;
   priceValue: number;
   badge?: string;

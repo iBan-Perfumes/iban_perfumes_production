@@ -30,3 +30,13 @@ export async function isAdminAuthenticated() {
   const token = cookieStore.get(ADMIN_COOKIE)?.value;
   return Boolean(await verifyAdminToken(token));
 }
+
+export async function getAdminSession() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get(ADMIN_COOKIE)?.value;
+  const payload = await verifyAdminToken(token);
+  if (!payload) return null;
+  return {
+    email: typeof payload.email === 'string' ? payload.email : 'Admin',
+  };
+}
