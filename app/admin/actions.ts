@@ -299,7 +299,24 @@ export async function saveProductAction(formData: FormData) {
     .getAll('images')
     .filter((f): f is File => f instanceof File && f.size > 0);
 
-  if (files.length > 0) {
+  let imageUrls: string[] = [];
+  try {
+    const raw = String(formData.get('imageUrls') ?? '').trim();
+    if (raw) {
+      const parsed = JSON.parse(raw) as unknown;
+      if (Array.isArray(parsed)) {
+        imageUrls = parsed
+          .map((u) => String(u).trim())
+          .filter((u) => u.startsWith('http'));
+      }
+    }
+  } catch {
+    return { error: 'Invalid image URLs' };
+  }
+
+  const urlsToInsert = [...imageUrls];
+
+  if (files.length > 0 || urlsToInsert.length > 0) {
     const existing = await db.query.productImages.findMany({
       where: eq(productImages.productId, productId),
       orderBy: [asc(productImages.sortOrder)],
@@ -309,6 +326,20 @@ export async function saveProductAction(formData: FormData) {
       : 0;
 
     const uploadedIds: string[] = [];
+
+    for (const url of urlsToInsert) {
+      const [img] = await db
+        .insert(productImages)
+        .values({
+          productId,
+          url,
+          alt: `${name} image`,
+          sortOrder: sortOrder++,
+        })
+        .returning();
+      uploadedIds.push(img.id);
+    }
+
     for (const file of files) {
       try {
         const url = await convertAndUploadWebp(file);
