@@ -2,35 +2,71 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Menu, X } from 'lucide-react';
+import { BrandLogo } from '@/components/layout/BrandLogo';
 import { navLinks } from '@/lib/site';
 
+function findHero() {
+  return (
+    document.querySelector('[data-site-hero]') ??
+    document.getElementById('home')
+  );
+}
+
 export function Navbar() {
+  const pathname = usePathname();
   const [visible, setVisible] = useState(false);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    const hero =
-      document.querySelector('[data-site-hero]') ??
-      document.getElementById('home');
+    setVisible(false);
 
-    if (hero) {
-      const observer = new IntersectionObserver(
+    let observer: IntersectionObserver | null = null;
+    let frameId = 0;
+    let removeScroll: (() => void) | null = null;
+    let cancelled = false;
+
+    const bindScrollFallback = () => {
+      const onScroll = () => setVisible(window.scrollY > 80);
+      onScroll();
+      window.addEventListener('scroll', onScroll, { passive: true });
+      removeScroll = () => window.removeEventListener('scroll', onScroll);
+    };
+
+    const bindHero = (hero: Element) => {
+      observer = new IntersectionObserver(
         ([entry]) => {
           setVisible(!entry.isIntersecting);
         },
         { threshold: 0 }
       );
       observer.observe(hero);
-      return () => observer.disconnect();
+    };
+
+    const hero = findHero();
+    if (hero) {
+      bindHero(hero);
+    } else {
+      // Wait one frame for the new page hero to mount before falling back.
+      frameId = requestAnimationFrame(() => {
+        if (cancelled) return;
+        const nextHero = findHero();
+        if (nextHero) {
+          bindHero(nextHero);
+        } else {
+          bindScrollFallback();
+        }
+      });
     }
 
-    // Routes without a hero banner: show after a short scroll.
-    const onScroll = () => setVisible(window.scrollY > 80);
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
+    return () => {
+      cancelled = true;
+      if (frameId) cancelAnimationFrame(frameId);
+      observer?.disconnect();
+      removeScroll?.();
+    };
+  }, [pathname]);
 
   useEffect(() => {
     if (!open) return;
@@ -58,23 +94,12 @@ export function Navbar() {
         aria-label="Primary"
       >
         <Link
-          href="/home"
-          className="inline-flex items-center gap-3"
+          href="/"
+          className="inline-flex items-center"
           aria-label="i-BAN Perfumes home"
         >
-          <span
-            className="grid h-10 w-10 place-items-center overflow-hidden rounded-[12px] border border-stone-200 bg-stone-900 text-[0.68rem] font-bold tracking-wide text-white"
-            aria-hidden="true"
-          >
-            iB
-          </span>
-          <span className="flex flex-col gap-0.5">
-            <span className="text-sm font-bold tracking-wide text-stone-900">
-              i-BAN Perfumes
-            </span>
-            <span className="text-[0.6rem] font-semibold uppercase tracking-[0.16em] text-stone-400">
-              Eau de Parfum
-            </span>
+          <span className="block w-[5.75rem] sm:w-[6.25rem]">
+            <BrandLogo variant="black" tone="dark" size="compact" priority />
           </span>
         </Link>
 

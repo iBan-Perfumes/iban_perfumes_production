@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Menu, X } from 'lucide-react';
+import { BrandLogo } from '@/components/layout/BrandLogo';
 import { navLinks } from '@/lib/site';
 
 interface SiteTopBarProps {
@@ -25,23 +26,12 @@ export function SiteTopBar({ activeHref }: SiteTopBarProps) {
     <header className="absolute inset-x-0 top-0 z-20 px-5 pt-6 sm:px-8 lg:px-12">
       <div className="relative mx-auto flex max-w-7xl items-center justify-between gap-5">
         <Link
-          href="/home"
-          className="inline-flex items-center gap-3"
+          href="/"
+          className="inline-flex items-center"
           aria-label="i-BAN Perfumes home"
         >
-          <span
-            className="grid h-12 w-12 place-items-center overflow-hidden rounded-[15px] border border-white/25 bg-stone-950/60 text-[0.72rem] font-bold tracking-wide text-amber-200 shadow-lg backdrop-blur-md"
-            aria-hidden="true"
-          >
-            iB
-          </span>
-          <span className="flex flex-col gap-0.5">
-            <span className="text-[0.92rem] font-bold tracking-wide text-white">
-              i-BAN Perfumes
-            </span>
-            <span className="text-[0.62rem] font-semibold uppercase tracking-[0.16em] text-white/50">
-              Eau de Parfum
-            </span>
+          <span className="block w-[5.75rem] sm:w-[6.25rem]">
+            <BrandLogo variant="transparent" tone="light" size="compact" priority />
           </span>
         </Link>
 

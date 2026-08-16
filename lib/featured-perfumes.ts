@@ -1,8 +1,6 @@
-import type { CatalogProduct } from '@/lib/catalog';
-import { catalogProducts } from '@/lib/catalog';
+import type { CatalogProduct } from '@/lib/catalog-types';
 
-/** @deprecated Prefer CatalogProduct from lib/catalog — kept for existing imports. */
-export interface FeaturedPerfume {
+export type FeaturedPerfume = {
   id: string;
   name: string;
   description: string;
@@ -10,9 +8,10 @@ export interface FeaturedPerfume {
   notesImage: string;
   price: string;
   badge?: string;
-}
+  slug: string;
+};
 
-function toFeatured(p: CatalogProduct): FeaturedPerfume {
+export function toFeatured(p: CatalogProduct): FeaturedPerfume {
   return {
     id: p.id,
     name: p.name,
@@ -21,9 +20,10 @@ function toFeatured(p: CatalogProduct): FeaturedPerfume {
     notesImage: p.notesImage,
     price: p.price,
     badge: p.badge,
+    slug: p.slug,
   };
 }
 
-/** Derived from catalog — no duplicated product list. */
-export const featuredPerfumes: FeaturedPerfume[] =
-  catalogProducts.map(toFeatured);
+export function mapFeatured(products: CatalogProduct[]): FeaturedPerfume[] {
+  return products.filter((p) => p.featured && p.available).map(toFeatured);
+}

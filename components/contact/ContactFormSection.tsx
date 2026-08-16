@@ -112,6 +112,24 @@ export function ContactFormSection() {
               </div>
               <div>
                 <label
+                  htmlFor="contact-phone"
+                  className="mb-2 block text-sm tracking-wider text-stone-700"
+                >
+                  Phone
+                </label>
+                <input
+                  id="contact-phone"
+                  type="tel"
+                  name="phone"
+                  required
+                  autoComplete="tel"
+                  inputMode="tel"
+                  className="w-full rounded-lg border border-stone-200 bg-white/60 px-4 py-3 text-stone-800 transition-colors focus:border-amber-500 focus:outline-none"
+                  placeholder="Your phone number"
+                />
+              </div>
+              <div>
+                <label
                   htmlFor="contact-email"
                   className="mb-2 block text-sm tracking-wider text-stone-700"
                 >

@@ -30,10 +30,10 @@ export function About() {
             <div className="relative mx-auto w-full max-w-[420px]">
               <div className="relative w-full overflow-hidden rounded-lg bg-stone-900 shadow-xl">
                 <Image
-                  src="/images/oris_img.png"
-                  alt="i-BAN Perfumes ORIS eau de parfum"
-                  width={1148}
-                  height={1370}
+                  src="/ORIS_PERFUME_LOGO.png"
+                  alt="i-BAN Perfumes ORIS logo"
+                  width={1269}
+                  height={1240}
                   sizes="(min-width: 768px) 420px, 100vw"
                   className="block h-auto w-full object-contain object-center"
                 />

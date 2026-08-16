@@ -9,7 +9,9 @@ import {
   type PointerEvent as ReactPointerEvent,
 } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { Menu, X } from 'lucide-react';
+import { BrandLogo } from '@/components/layout/BrandLogo';
 import { cinematicSlides } from '@/lib/cinematic-slides';
 import { navLinks } from '@/lib/site';
 import '@/app/cinematic-carousel.css';
@@ -235,15 +237,11 @@ export function Hero() {
 
       <div className="cc-shell">
         <header className="cc-top-bar">
-          <a href="/home" className="cc-brand" aria-label="i-BAN Perfumes home">
-            <span className="cc-brand-mark" aria-hidden="true">
-              <span>iB</span>
+          <Link href="/" className="cc-brand" aria-label="i-BAN Perfumes home">
+            <span className="cc-brand-logo">
+              <BrandLogo variant="transparent" tone="light" size="compact" priority />
             </span>
-            <span className="cc-brand-copy">
-              <span className="cc-brand-name">i-BAN Perfumes</span>
-              <span className="cc-brand-tagline">Eau de Parfum</span>
-            </span>
-          </a>
+          </Link>
 
           <ul className="cc-top-nav" role="list" aria-label="Primary">
             {navLinks.map((l) => (
@@ -324,19 +322,6 @@ export function Hero() {
                 <span className="cc-title-accent">{slide.titleAccent}</span>
               </h1>
 
-              <ul className="cc-meta-list" aria-label="Fragrance details">
-                {slide.meta.map((item, i) => (
-                  <li
-                    key={item}
-                    className={`cc-meta-item${
-                      i === slide.meta.length - 1 ? ' is-highlighted' : ''
-                    }`}
-                  >
-                    {item}
-                  </li>
-                ))}
-              </ul>
-
               <p className="cc-story-description">{slide.description}</p>
 
               <ul className="cc-genre-list" aria-label="Fragrance notes">
@@ -375,7 +360,12 @@ export function Hero() {
                 </p>
               </div>
 
-              <div className="cc-preview-list" ref={previewListRef} role="list">
+              <div
+                className="cc-preview-list"
+                ref={previewListRef}
+                role="list"
+                data-lenis-prevent
+              >
                 {slides.map((s, i) => {
                   const isActive = i === activeIndex;
                   return (

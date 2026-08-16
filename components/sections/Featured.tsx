@@ -2,12 +2,13 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { featuredPerfumes } from '@/lib/featured-perfumes';
+import type { FeaturedPerfume } from '@/lib/featured-perfumes';
 
 const EDGE = 2;
 
-export function Featured() {
+export function Featured({ items }: { items: FeaturedPerfume[] }) {
   const trackRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
@@ -87,9 +88,10 @@ export function Featured() {
 
       <div
         ref={trackRef}
+        data-lenis-prevent-horizontal
         className="flex snap-x snap-mandatory gap-6 overflow-x-auto pb-2 pl-5 scrollbar-none scroll-pl-5 sm:pl-8 sm:scroll-pl-8"
       >
-        {featuredPerfumes.map((perfume) => (
+        {items.map((perfume) => (
           <article
             key={perfume.id}
             data-card
@@ -123,13 +125,19 @@ export function Featured() {
                   <h3 className="font-serif text-lg font-semibold uppercase text-stone-900">
                     {perfume.name}
                   </h3>
-                  <span className="shrink-0 text-sm font-medium text-amber-700">
+                  <span className="font-price shrink-0 text-sm font-medium text-amber-700">
                     {perfume.price}
                   </span>
                 </div>
                 <p className="mt-1.5 line-clamp-2 text-sm leading-relaxed text-stone-500">
                   {perfume.description}
                 </p>
+                <Link
+                  href={`/products/${perfume.slug}`}
+                  className="mt-4 inline-flex w-full items-center justify-center rounded-full border border-stone-900 bg-transparent px-4 py-2.5 text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-stone-900 transition-colors hover:bg-stone-900 hover:text-white"
+                >
+                  View Details
+                </Link>
               </div>
             </div>
           </article>

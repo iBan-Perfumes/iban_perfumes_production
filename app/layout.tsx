@@ -1,8 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Cormorant_Garamond, Jost, Tenor_Sans } from 'next/font/google';
-import { Footer } from '@/components/layout/Footer';
-import { Navbar } from '@/components/layout/Navbar';
+import { Cormorant_Garamond, Jost, Outfit, Tenor_Sans } from 'next/font/google';
+import { StorefrontChrome } from '@/components/layout/StorefrontChrome';
 import { getSiteUrl, isIndexingAllowed, SITE_DESCRIPTION, SITE_NAME } from '@/lib/site';
 import {
   getOrganizationJsonLd,
@@ -22,6 +21,13 @@ const jost = Jost({
   subsets: ['latin'],
   weight: ['300', '400', '500'],
   variable: '--font-jost',
+  display: 'swap',
+});
+
+const outfit = Outfit({
+  subsets: ['latin'],
+  weight: ['300', '400', '500'],
+  variable: '--font-outfit',
   display: 'swap',
 });
 
@@ -60,12 +66,12 @@ export const metadata: Metadata = {
   creator: SITE_NAME,
   publisher: SITE_NAME,
   alternates: {
-    canonical: '/home',
+    canonical: '/',
   },
   openGraph: {
     type: 'website',
     locale: 'en_IN',
-    url: `${siteUrl}/home`,
+    url: siteUrl,
     siteName: SITE_NAME,
     title: `${SITE_NAME} | Luxury Eau de Parfum`,
     description: SITE_DESCRIPTION,
@@ -107,21 +113,21 @@ export const metadata: Metadata = {
       },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   const organizationLd = getOrganizationJsonLd();
-  const productsLd = getProductListJsonLd();
+  const productsLd = await getProductListJsonLd();
 
   return (
     <html
       lang="en"
-      className={`${cormorant.variable} ${jost.variable} ${tenorSans.variable}`}
+      className={`${cormorant.variable} ${jost.variable} ${outfit.variable} ${tenorSans.variable}`}
     >
       <body className="bg-white text-stone-700 overflow-x-hidden antialiased">
-        <Link href="/home" className="skip-link">
+        <Link href="/" className="skip-link">
           Skip to content
         </Link>
         <script
@@ -132,9 +138,7 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(productsLd) }}
         />
-        <Navbar />
-        {children}
-        <Footer />
+        <StorefrontChrome>{children}</StorefrontChrome>
       </body>
     </html>
   );

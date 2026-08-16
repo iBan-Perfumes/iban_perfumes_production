@@ -35,12 +35,15 @@ export function FragranceNotesContent({ product }: { product: CatalogProduct }) 
 }
 
 export function ProductDetailsContent({ product }: { product: CatalogProduct }) {
+  const categoryList = (
+    product.categories?.length ? product.categories : [product.family]
+  ).join(', ');
+
   const rows: [string, string][] = [
     ['Brand', product.details.brand],
     ['Format', product.details.format],
-    ['Volume', product.details.volume],
-    ['Category', product.details.category],
-    ['Fragrance Family', product.details.fragranceFamily],
+    ['Category', categoryList],
+    ['Fragrance Family', categoryList],
     ['Character', product.details.character],
     ['Longevity', product.details.longevity],
     ['Occasion', product.details.occasion],

@@ -36,7 +36,7 @@ export function RelatedProducts({ products }: { products: CatalogProduct[] }) {
                 </Link>
                 <div className="p-5 flex flex-col flex-1 text-center">
                   <h3 className="font-serif text-xl text-stone-900">{p.name}</h3>
-                  <p className="text-amber-700 font-medium mt-2">{p.price}</p>
+                  <p className="font-price text-amber-700 font-medium mt-2">{p.price}</p>
                   <Link
                     href={`/products/${p.slug}`}
                     className="mt-5 inline-flex items-center justify-center border border-stone-900 px-6 py-2.5 text-[11px] tracking-[0.2em] text-stone-900 uppercase transition-colors duration-300 hover:border-amber-700 hover:text-amber-700"

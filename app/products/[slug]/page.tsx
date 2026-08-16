@@ -8,10 +8,9 @@ import { ProductGallery } from '@/components/pdp/ProductGallery';
 import { ProductInfoSections } from '@/components/pdp/ProductInfoSections';
 import { RelatedProducts } from '@/components/pdp/RelatedProducts';
 import {
-  catalogProducts,
   getProductBySlug,
   getRelatedProducts,
-} from '@/lib/catalog';
+} from '@/lib/catalog-db';
 import { SITE_NAME } from '@/lib/site';
 import {
   getBreadcrumbJsonLd,
@@ -22,21 +21,22 @@ interface ProductPageProps {
   params: Promise<{ slug: string }>;
 }
 
-export function generateStaticParams() {
-  return catalogProducts.map((p) => ({ slug: p.slug }));
-}
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({
   params,
 }: ProductPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const product = getProductBySlug(slug);
+  const product = await getProductBySlug(slug);
   if (!product) {
     return { title: 'Product Not Found' };
   }
 
   const description =
     product.shortDescription || product.heroCopy || product.story;
+  const imageUrl = product.perfumeImage.startsWith('http')
+    ? product.perfumeImage
+    : product.perfumeImage;
 
   return {
     title: `${product.name} Eau de Parfum`,
@@ -52,7 +52,7 @@ export async function generateMetadata({
       description,
       images: [
         {
-          url: product.perfumeImage,
+          url: imageUrl,
           width: 800,
           height: 800,
           alt: `${product.name} Eau de Parfum`,
@@ -63,23 +63,23 @@ export async function generateMetadata({
       card: 'summary_large_image',
       title: `${product.name} | ${SITE_NAME}`,
       description,
-      images: [product.perfumeImage],
+      images: [imageUrl],
     },
   };
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {
   const { slug } = await params;
-  const product = getProductBySlug(slug);
+  const product = await getProductBySlug(slug);
   if (!product) notFound();
 
-  const related = getRelatedProducts(product.slug, 4);
+  const related = await getRelatedProducts(product.slug, 4);
   const breadcrumbLd = getBreadcrumbJsonLd([
-    { name: 'Home', path: '/home' },
+    { name: 'Home', path: '/' },
     { name: 'Collection', path: '/collection' },
     { name: product.name, path: `/products/${product.slug}` },
   ]);
-  const productLd = getProductJsonLd(product.slug);
+  const productLd = await getProductJsonLd(product.slug);
 
   return (
     <>
@@ -94,27 +94,29 @@ export default async function ProductPage({ params }: ProductPageProps) {
         />
       )}
       <main id="main">
-        <div className="max-w-7xl mx-auto px-5 sm:px-8 pt-8 sm:pt-12 pb-16 sm:pb-20">
+        <div className="mx-auto max-w-7xl px-5 pb-16 pt-8 sm:px-8 sm:pb-20 sm:pt-12">
           <Breadcrumb
             items={[
-              { label: 'Home', href: '/home' },
+              { label: 'Home', href: '/' },
               { label: 'Collection', href: '/collection' },
               { label: product.family },
               { label: product.name },
             ]}
           />
 
-          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 xl:gap-20">
+          <div className="grid gap-10 lg:grid-cols-2 lg:gap-16 xl:gap-20">
             <ProductGallery images={product.gallery} />
             <BuyBox product={product} />
           </div>
 
           <section
-            className="mt-16 sm:mt-20 max-w-3xl lg:max-w-none"
+            className="mt-16 max-w-3xl sm:mt-20 lg:max-w-none"
             aria-labelledby="product-info-heading"
           >
             <header className="mb-10 sm:mb-12">
-              <p className="text-amber-700 tracking-[0.4em] text-xs mb-4">DETAILS</p>
+              <p className="mb-4 text-xs tracking-[0.4em] text-amber-700">
+                DETAILS
+              </p>
               <h2
                 id="product-info-heading"
                 className="font-tenor text-3xl font-normal tracking-tight text-stone-900 sm:text-4xl"

@@ -1,16 +1,11 @@
 'use client';
 
 import { AnimatePresence, LayoutGroup, motion } from 'framer-motion';
-import { ListFilter, SearchX } from 'lucide-react';
+import { ChevronDown, ListFilter, SearchX } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { ProductCard } from '@/components/collection/ProductCard';
-import {
-  filterAndSortProducts,
-  getAllCategories,
-  getAllPrices,
-  type CatalogSort,
-  type FragranceCategory,
-} from '@/lib/catalog';
+import { filterAndSortProducts } from '@/lib/catalog-filter';
+import type { CatalogProduct, CatalogSort } from '@/lib/catalog-types';
 
 const SORT_OPTIONS: { value: CatalogSort; label: string }[] = [
   { value: 'featured', label: 'Featured' },
@@ -21,18 +16,39 @@ const SORT_OPTIONS: { value: CatalogSort; label: string }[] = [
   { value: 'name-desc', label: 'Alphabetical Z-A' },
 ];
 
-export function CollectionBrowse() {
-  const categories = useMemo(() => getAllCategories(), []);
-  const prices = useMemo(() => getAllPrices(), []);
+export function CollectionBrowse({
+  products: allProducts,
+}: {
+  products: CatalogProduct[];
+}) {
+  const categories = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          allProducts.flatMap((p) =>
+            p.categories?.length ? p.categories : [p.category]
+          )
+        )
+      ).sort(),
+    [allProducts]
+  );
+  const prices = useMemo(
+    () =>
+      Array.from(new Set(allProducts.map((p) => p.price))).sort(
+        (a, b) =>
+          Number(a.replace(/[₹,]/g, '')) - Number(b.replace(/[₹,]/g, ''))
+      ),
+    [allProducts]
+  );
 
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const [category, setCategory] = useState<FragranceCategory | 'All'>('All');
+  const [category, setCategory] = useState<string | 'All'>('All');
   const [price, setPrice] = useState<string | 'All'>('All');
   const [sort, setSort] = useState<CatalogSort>('featured');
 
   const products = useMemo(
-    () => filterAndSortProducts({ category, price, sort }),
-    [category, price, sort]
+    () => filterAndSortProducts(allProducts, { category, price, sort }),
+    [allProducts, category, price, sort]
   );
 
   const clearFilters = () => {
@@ -142,9 +158,34 @@ export function CollectionBrowse() {
       </div>
 
       <div className="mx-auto max-w-7xl px-6 pt-8">
+        <div className="mb-10 lg:hidden">
+          <label htmlFor="collection-category" className="sr-only">
+            Fragrance category
+          </label>
+          <div className="relative">
+            <select
+              id="collection-category"
+              value={category}
+              onChange={(e) => setCategory(e.target.value as string | 'All')}
+              className="w-full appearance-none rounded-full border border-stone-300 bg-white py-3 pl-4 pr-11 text-sm uppercase tracking-[0.12em] text-stone-800 outline-none focus:border-amber-700"
+            >
+              <option value="All">All</option>
+              {categories.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
+            <ChevronDown
+              className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-500"
+              aria-hidden
+            />
+          </div>
+        </div>
+
         <LayoutGroup>
           <div
-            className="mb-10 flex flex-wrap gap-2"
+            className="mb-10 hidden flex-wrap gap-2 lg:flex"
             role="tablist"
             aria-label="Fragrance categories"
           >
