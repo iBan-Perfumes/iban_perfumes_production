@@ -1,8 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useMemo, useRef, useState, useTransition } from 'react';
-import { useFormStatus } from 'react-dom';
+import { useEffect, useMemo, useRef, useState, useTransition } from 'react';
 import {
   ArrowDown,
   ArrowUp,
@@ -12,6 +11,7 @@ import {
   Star,
   Trash2,
   Upload,
+  X,
 } from 'lucide-react';
 import {
   deleteProductImageAction,
@@ -35,6 +35,12 @@ type VariantDraft = {
   name: string;
   mrp: string;
   offerPrice: string;
+};
+
+type StagedImage = {
+  key: string;
+  file: File;
+  previewUrl: string;
 };
 
 type ProductFormProps = {
@@ -106,18 +112,72 @@ function isRedirectError(error: unknown): boolean {
   );
 }
 
-function SubmitButton({ isEdit }: { isEdit: boolean }) {
-  const { pending } = useFormStatus();
+function uploadImagesWithProgress(
+  files: FileList,
+  onProgress: (pct: number) => void
+): Promise<string[]> {
+  return new Promise((resolve, reject) => {
+    const body = new FormData();
+    Array.from(files).forEach((f) => body.append('images', f));
+
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', '/api/admin/product-images');
+    xhr.responseType = 'json';
+
+    xhr.upload.onprogress = (event) => {
+      if (!event.lengthComputable || event.total <= 0) {
+        onProgress(1);
+        return;
+      }
+      const pct = Math.min(
+        100,
+        Math.max(1, Math.round((event.loaded / event.total) * 100))
+      );
+      onProgress(pct);
+    };
+
+    xhr.onload = () => {
+      const data = xhr.response as { urls?: string[]; error?: string } | null;
+      if (xhr.status >= 200 && xhr.status < 300 && data?.urls) {
+        onProgress(100);
+        resolve(data.urls);
+        return;
+      }
+      reject(
+        new Error(
+          data?.error || `Upload failed (${xhr.status || 'network error'})`
+        )
+      );
+    };
+
+    xhr.onerror = () => reject(new Error('Upload failed. Please try again.'));
+    xhr.onabort = () => reject(new Error('Upload cancelled.'));
+
+    onProgress(1);
+    xhr.send(body);
+  });
+}
+
+function SubmitButton({
+  isEdit,
+  uploading,
+  saving,
+}: {
+  isEdit: boolean;
+  uploading: boolean;
+  saving: boolean;
+}) {
+  const busy = uploading || saving;
   return (
     <button
       type="submit"
-      disabled={pending}
+      disabled={busy}
       className={`${primaryButtonClassName('min-w-[10rem]')} !bg-stone-900 hover:!bg-stone-800`}
     >
-      {pending ? (
+      {busy ? (
         <>
           <Loader2 className="h-4 w-4 shrink-0 animate-spin" aria-hidden />
-          <span>Saving…</span>
+          <span>{uploading ? 'Uploading…' : 'Saving…'}</span>
         </>
       ) : isEdit ? (
         'Save changes'
@@ -158,12 +218,40 @@ export function ProductForm({ categories, product }: ProductFormProps) {
   const [invalidFields, setInvalidFields] = useState<Set<RequiredField>>(
     () => new Set()
   );
-  const [fileCount, setFileCount] = useState(0);
+  const [stagedImages, setStagedImages] = useState<StagedImage[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [dragging, setDragging] = useState(false);
   const [deleteImageId, setDeleteImageId] = useState<string | null>(null);
   const [imagePending, startImageTransition] = useTransition();
   const fileRef = useRef<HTMLInputElement>(null);
+  const stagedImagesRef = useRef(stagedImages);
+  stagedImagesRef.current = stagedImages;
   const autoSlug = useMemo(() => slugify(name), [name]);
+
+  useEffect(() => {
+    return () => {
+      stagedImagesRef.current.forEach((img) =>
+        URL.revokeObjectURL(img.previewUrl)
+      );
+    };
+  }, []);
+
+  const syncFileInput = (files: File[]) => {
+    if (!fileRef.current) return;
+    const dt = new DataTransfer();
+    files.forEach((f) => dt.items.add(f));
+    fileRef.current.files = dt.files;
+  };
+
+  const clearStagedImages = () => {
+    setStagedImages((prev) => {
+      prev.forEach((img) => URL.revokeObjectURL(img.previewUrl));
+      return [];
+    });
+    if (fileRef.current) fileRef.current.value = '';
+  };
 
   const variantsJson = useMemo(
     () =>
@@ -235,12 +323,30 @@ export function ProductForm({ categories, product }: ProductFormProps) {
   };
 
   const applyFiles = (files: FileList | File[] | null) => {
-    if (!files || !fileRef.current) return;
-    const list = Array.from(files);
-    const dt = new DataTransfer();
-    list.forEach((f) => dt.items.add(f));
-    fileRef.current.files = dt.files;
-    setFileCount(dt.files.length);
+    if (!files) return;
+    const incoming = Array.from(files).filter((f) => f.type.startsWith('image/'));
+    if (incoming.length === 0) return;
+
+    setStagedImages((prev) => {
+      const added: StagedImage[] = incoming.map((file, i) => ({
+        key: `${file.name}-${file.size}-${file.lastModified}-${Date.now()}-${i}`,
+        file,
+        previewUrl: URL.createObjectURL(file),
+      }));
+      const next = [...prev, ...added];
+      syncFileInput(next.map((s) => s.file));
+      return next;
+    });
+  };
+
+  const removeStagedImage = (key: string) => {
+    setStagedImages((prev) => {
+      const target = prev.find((s) => s.key === key);
+      if (target) URL.revokeObjectURL(target.previewUrl);
+      const next = prev.filter((s) => s.key !== key);
+      syncFileInput(next.map((s) => s.file));
+      return next;
+    });
   };
 
   const runImageAction = (
@@ -324,10 +430,10 @@ export function ProductForm({ categories, product }: ProductFormProps) {
         id="product-form"
         className="space-y-6"
         noValidate
-        onSubmit={(e) => {
+        onSubmit={async (e) => {
+          e.preventDefault();
           const form = e.currentTarget;
           if (!validateForm(form)) {
-            e.preventDefault();
             setError('Please fill all required fields');
             const first = form.querySelector(
               '[aria-invalid="true"]'
@@ -335,20 +441,49 @@ export function ProductForm({ categories, product }: ProductFormProps) {
             first?.focus();
             return;
           }
+
           setError(null);
-        }}
-        action={async (fd) => {
-          setError(null);
-          // Ensure controlled slug is submitted
+          const fd = new FormData(form);
           if (!String(fd.get('slug') ?? '').trim()) {
             fd.set('slug', slug || autoSlug);
           }
+
+          const files = fileRef.current?.files;
+          if (files && files.length > 0) {
+            setUploading(true);
+            setUploadProgress(1);
+            try {
+              const urls = await uploadImagesWithProgress(
+                files,
+                setUploadProgress
+              );
+              fd.set('imageUrls', JSON.stringify(urls));
+              fd.delete('images');
+              clearStagedImages();
+            } catch (err) {
+              setError(
+                err instanceof Error
+                  ? err.message
+                  : 'Failed to upload images. Please try again.'
+              );
+              setUploading(false);
+              setUploadProgress(null);
+              return;
+            } finally {
+              setUploading(false);
+            }
+          }
+
+          setSaving(true);
           try {
             const result = await saveProductAction(fd);
             if (result?.error) setError(result.error);
           } catch (err) {
             if (isRedirectError(err)) throw err;
             setError('Could not save product. Please try again.');
+          } finally {
+            setSaving(false);
+            setUploadProgress(null);
           }
         }}
       >
@@ -704,17 +839,18 @@ export function ProductForm({ categories, product }: ProductFormProps) {
 
             <AdminCard
               title="Product Images"
-              description="Upload multiple images at once. Each file is converted to WebP before saving."
+              description="Upload multiple images at once. Each file is converted to WebP when you save."
             >
               <div
                 onDragOver={(e) => {
                   e.preventDefault();
-                  setDragging(true);
+                  if (!uploading && !saving) setDragging(true);
                 }}
                 onDragLeave={() => setDragging(false)}
                 onDrop={(e) => {
                   e.preventDefault();
                   setDragging(false);
+                  if (uploading || saving) return;
                   applyFiles(e.dataTransfer.files);
                 }}
                 className={`rounded-xl border-2 border-dashed px-4 py-10 text-center transition-colors ${
@@ -732,6 +868,7 @@ export function ProductForm({ categories, product }: ProductFormProps) {
                 </p>
                 <button
                   type="button"
+                  disabled={uploading || saving}
                   className={`${primaryButtonClassName()} mt-4`}
                   onClick={() => fileRef.current?.click()}
                 >
@@ -744,16 +881,71 @@ export function ProductForm({ categories, product }: ProductFormProps) {
                   type="file"
                   accept="image/jpeg,image/png,image/webp,image/avif"
                   multiple
+                  disabled={uploading || saving}
                   className="sr-only"
-                  onChange={(e) => setFileCount(e.target.files?.length ?? 0)}
+                  onChange={(e) => applyFiles(e.target.files)}
                 />
-                {fileCount > 0 && (
+                {stagedImages.length > 0 && uploadProgress === null && (
                   <p className="mt-3 text-xs font-medium text-amber-800">
-                    {fileCount} file{fileCount === 1 ? '' : 's'} selected — will
-                    convert to WebP on save
+                    {stagedImages.length} file
+                    {stagedImages.length === 1 ? '' : 's'} selected — will upload
+                    with progress when you save
                   </p>
                 )}
+                {uploadProgress !== null && (
+                  <div className="mx-auto mt-5 w-full max-w-md text-left">
+                    <div className="mb-1.5 flex items-center justify-between text-xs font-medium text-stone-700">
+                      <span>Uploading…</span>
+                      <span aria-live="polite">{uploadProgress}%</span>
+                    </div>
+                    <div
+                      className="h-2.5 overflow-hidden rounded-full bg-stone-200"
+                      role="progressbar"
+                      aria-valuemin={1}
+                      aria-valuemax={100}
+                      aria-valuenow={uploadProgress}
+                      aria-label="Image upload progress"
+                    >
+                      <div
+                        className="h-full rounded-full bg-amber-700 transition-[width] duration-150 ease-out"
+                        style={{ width: `${uploadProgress}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
+
+              {stagedImages.length > 0 && (
+                <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+                  {stagedImages.map((img) => (
+                    <div
+                      key={img.key}
+                      className="overflow-hidden rounded-xl border border-stone-200 bg-white"
+                    >
+                      <div className="relative aspect-square bg-stone-100">
+                        {/* eslint-disable-next-line @next/next/no-img-element -- local blob preview */}
+                        <img
+                          src={img.previewUrl}
+                          alt={img.file.name}
+                          className="h-full w-full object-cover"
+                        />
+                        <button
+                          type="button"
+                          aria-label={`Remove ${img.file.name}`}
+                          disabled={uploading || saving}
+                          onClick={() => removeStagedImage(img.key)}
+                          className="absolute right-2 top-2 rounded-full bg-stone-900/80 p-1.5 text-white transition-colors hover:bg-red-600 disabled:opacity-50"
+                        >
+                          <X className="h-3.5 w-3.5" aria-hidden />
+                        </button>
+                      </div>
+                      <p className="truncate px-2.5 py-2 text-xs text-stone-500">
+                        {img.file.name}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
             </AdminCard>
           </div>
 
@@ -928,7 +1120,11 @@ export function ProductForm({ categories, product }: ProductFormProps) {
           </p>
         )}
 
-        <SubmitButton isEdit={Boolean(product)} />
+        <SubmitButton
+          isEdit={Boolean(product)}
+          uploading={uploading}
+          saving={saving}
+        />
       </form>
 
       <ConfirmDialog
