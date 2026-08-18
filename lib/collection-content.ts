@@ -5,7 +5,7 @@ export const collectionHero = {
     'Discover our carefully crafted Eau de Parfum collection designed for every personality, every mood, and every occasion.',
   primaryCta: { label: 'Explore Collection', href: 'browse' },
   secondaryCta: { label: 'Contact Us', href: '/contact' },
-  image: '/images/cinematic/ORIS_BANNER_IMG.png',
+  image: '/images/iban-collection-page-banner.png',
 } as const;
 
 export const collectionPageSeo = {

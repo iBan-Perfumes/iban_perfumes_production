@@ -43,15 +43,3 @@ export const products: Product[] = [
     image: '/images/product-fleur-sauvage.jpg',
   },
 ];
-
-export const menScents = [
-  { name: 'Cuir Impérial', note: 'Leather · Tobacco · Amber' },
-  { name: 'Bois Sauvage', note: 'Sandalwood · Black Pepper' },
-  { name: 'Marin Noir', note: 'Sea Salt · Juniper · Smoke' },
-] as const;
-
-export const womenScents = [
-  { name: 'Rose Éternelle', note: 'Centifolia Rose · Lychee · Musk' },
-  { name: 'Jardin Secret', note: 'Peony · White Musk · Cedar' },
-  { name: 'Soie Dorée', note: 'Honey · Orange Blossom · Amber' },
-] as const;

@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     description: collectionPageSeo.description,
     images: [
       {
-        url: '/images/cinematic/ORIS_BANNER_IMG.png',
+        url: '/images/iban-collection-page-banner.png',
         width: 1920,
         height: 1080,
         alt: `${SITE_NAME} — Find Your Signature Fragrance`,
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: `${collectionPageSeo.title} | ${SITE_NAME}`,
     description: collectionPageSeo.description,
-    images: ['/images/cinematic/ORIS_BANNER_IMG.png'],
+    images: ['/images/iban-collection-page-banner.png'],
   },
 };
 

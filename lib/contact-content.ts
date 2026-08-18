@@ -3,7 +3,7 @@ export const contactHero = {
   heading: 'We Would Love To Hear From You.',
   description:
     'Questions about our fragrances, gifting, or wholesale? Reach out and our team will get back to you shortly.',
-  image: '/images/cinematic/ORIS_BANNER_IMG.png',
+  image: '/images/iban_contactus_page.png',
 } as const;
 
 export const contactPageSeo = {

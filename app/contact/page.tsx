@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     description: contactPageSeo.description,
     images: [
       {
-        url: '/images/cinematic/ORIS_BANNER_IMG.png',
+        url: '/images/iban_contactus_page.png',
         width: 1920,
         height: 1080,
         alt: `${SITE_NAME} — Contact`,
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: `${contactPageSeo.title} | ${SITE_NAME}`,
     description: contactPageSeo.description,
-    images: ['/images/cinematic/ORIS_BANNER_IMG.png'],
+    images: ['/images/iban_contactus_page.png'],
   },
 };
 

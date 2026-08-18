@@ -8,6 +8,7 @@ import {
   type NotePyramidJson,
 } from '@/lib/db/schema';
 import { SITE_NAME } from '@/lib/site';
+import { genderForSlug } from '@/lib/home-lineups';
 import type {
   CatalogProduct,
   CatalogSort,
@@ -148,7 +149,7 @@ function enrichRow(row: {
     character: row.character,
     longevity: 'Moderate to long-lasting',
     occasion: 'Day to evening',
-    gender: 'Unisex',
+    gender: genderForSlug(row.slug),
     concentration: 'Eau de Parfum',
     country: 'India',
   };
