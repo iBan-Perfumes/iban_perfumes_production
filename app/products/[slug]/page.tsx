@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Breadcrumb } from '@/components/pdp/Breadcrumb';
 import { BuyBox } from '@/components/pdp/BuyBox';
-import { LifestyleBanner } from '@/components/pdp/LifestyleBanner';
 import { ProductFooterCta } from '@/components/pdp/ProductFooterCta';
 import { ProductGallery } from '@/components/pdp/ProductGallery';
 import { ProductInfoSections } from '@/components/pdp/ProductInfoSections';
@@ -127,11 +126,6 @@ export default async function ProductPage({ params }: ProductPageProps) {
             <ProductInfoSections product={product} />
           </section>
         </div>
-
-        <LifestyleBanner
-          src={product.lifestyleBanner}
-          alt={`${product.name} lifestyle banner`}
-        />
 
         <RelatedProducts products={related} />
         <ProductFooterCta productName={product.name} />
