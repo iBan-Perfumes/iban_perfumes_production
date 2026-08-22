@@ -26,7 +26,7 @@ export const homeLineups = {
     heading: 'Crafted For Every Presence',
     description:
       'Fragrances designed beyond him or her — one collection for every personality, mood, and occasion.',
-    image: '/images/cinematic/ORIS_BANNER_IMG.png',
+    image: '/images/Iban_img_about.png',
     imageAlt: 'i-BAN unisex fragrance collection',
     imageOnLeft: true,
     backgroundClass: 'bg-white',
