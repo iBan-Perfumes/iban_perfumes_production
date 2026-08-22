@@ -39,8 +39,8 @@ export const homeLineups = {
     heading: 'Bold Woods, Quiet Power',
     description:
       'A focused pair of signature scents — aromatic woods and rich oud built for presence that does not need to announce itself.',
-    image: '/images/men.jpg',
-    imageAlt: 'Man applying cologne',
+    image: '/images/jordhab_hand_pic.png',
+    imageAlt: 'Man in a suit holding i-BAN Jordan perfume',
     imageOnLeft: false,
     backgroundClass: 'bg-stone-50',
     slugs: MASCULINE_SLUGS,

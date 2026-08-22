@@ -30,8 +30,8 @@ export const ourStory = {
     'Inspired by timeless perfumery traditions and modern lifestyles, each fragrance is carefully crafted using premium ingredients to deliver exceptional performance, elegant compositions, and memorable experiences.',
     "Whether you're stepping into an important meeting, celebrating life's milestones, or simply expressing yourself every day, i-BAN Perfumes is designed to complement every personality and every occasion.",
   ],
-  image: '/images/about.jpg',
-  imageAlt: 'i-BAN Perfumes luxury fragrance lifestyle',
+  image: '/images/iban-collection.png',
+  imageAlt: 'i-BAN Perfumes collection',
 } as const;
 
 export const philosophyCards = [

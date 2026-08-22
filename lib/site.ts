@@ -1,3 +1,5 @@
+import { getWhatsAppChatUrl } from '@/lib/whatsapp';
+
 export const SITE_NAME = 'i-BAN Perfumes';
 export const SITE_TAGLINE = 'Eau de Parfum';
 export const SITE_DESCRIPTION =
@@ -28,6 +30,24 @@ export const contactInfo: {
   email: string;
 } = {
   address: '',
-  phone: '',
+  phone: (process.env.NEXT_PUBLIC_PHONE_NUMBER ?? '').trim(),
   email: '',
 };
+
+export type SocialLink = {
+  label: 'WhatsApp' | 'Instagram' | 'Facebook';
+  href: string | null;
+};
+
+function envUrl(value: string | undefined): string {
+  return (value ?? '').trim();
+}
+
+/** Always returns WhatsApp, Instagram, and Facebook. `href` is null when unset. */
+export function getSocialLinks(): SocialLink[] {
+  return [
+    { label: 'WhatsApp', href: getWhatsAppChatUrl() },
+    { label: 'Instagram', href: envUrl(process.env.NEXT_PUBLIC_INSTAGRAM_URL) || null },
+    { label: 'Facebook', href: envUrl(process.env.NEXT_PUBLIC_FACEBOOK_URL) || null },
+  ];
+}

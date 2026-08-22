@@ -8,7 +8,15 @@ import type { FeaturedPerfume } from '@/lib/featured-perfumes';
 
 const EDGE = 2;
 
-export function Featured({ items }: { items: FeaturedPerfume[] }) {
+export function Featured({
+  items,
+  showHeading = true,
+  embedded = false,
+}: {
+  items: FeaturedPerfume[];
+  showHeading?: boolean;
+  embedded?: boolean;
+}) {
   const trackRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
@@ -50,12 +58,23 @@ export function Featured({ items }: { items: FeaturedPerfume[] }) {
   const btnBase =
     'inline-flex h-14 w-14 items-center justify-center rounded-full border bg-transparent transition-colors disabled:pointer-events-none';
 
+  const Wrapper = embedded ? 'div' : 'section';
+
   return (
-    <section id="featured" className="bg-white pt-10 pb-10 sm:pt-12 sm:pb-14">
-      <div className="mb-10 flex items-center justify-between gap-6 px-5 sm:px-8">
-        <h2 className="font-tenor text-3xl font-normal tracking-tight text-stone-900 sm:text-4xl">
-          Our Featured Items
-        </h2>
+    <Wrapper
+      {...(!embedded ? { id: 'featured' } : {})}
+      className={embedded ? '' : 'bg-white pt-10 pb-10 sm:pt-12 sm:pb-14'}
+    >
+      <div
+        className={`mb-10 flex items-center gap-6 px-5 sm:px-8 ${
+          showHeading ? 'justify-between' : 'justify-end'
+        }`}
+      >
+        {showHeading && (
+          <h2 className="font-tenor text-3xl font-normal tracking-tight text-stone-900 sm:text-4xl">
+            Our Featured Items
+          </h2>
+        )}
         <div className="hidden shrink-0 gap-3 sm:flex">
           <button
             type="button"
@@ -143,6 +162,6 @@ export function Featured({ items }: { items: FeaturedPerfume[] }) {
           </article>
         ))}
       </div>
-    </section>
+    </Wrapper>
   );
 }

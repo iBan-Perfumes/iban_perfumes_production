@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { Footer } from '@/components/layout/Footer';
 import { Navbar } from '@/components/layout/Navbar';
+import { WhatsAppFloat } from '@/components/layout/WhatsAppFloat';
 import { ScrollToTop } from '@/components/ScrollToTop';
 
 export function StorefrontChrome({ children }: { children: ReactNode }) {
@@ -20,6 +21,7 @@ export function StorefrontChrome({ children }: { children: ReactNode }) {
       <ScrollToTop />
       {children}
       <Footer />
+      <WhatsAppFloat />
     </>
   );
 }
