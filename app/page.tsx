@@ -4,7 +4,7 @@ import { Featured } from '@/components/sections/Featured';
 import { Collection } from '@/components/sections/Collection';
 import { FragranceLineup } from '@/components/sections/FragranceLineup';
 import { Quote } from '@/components/sections/Quote';
-import { Gifting } from '@/components/sections/Gifting';
+import { HomeCta } from '@/components/sections/HomeCta';
 import { SmoothScroller } from '@/components/SmoothScroller';
 import { getAvailableProducts } from '@/lib/catalog-db';
 import { mapFeatured } from '@/lib/featured-perfumes';
@@ -28,7 +28,7 @@ export default async function HomePage() {
         <FragranceLineup lineup={homeLineups.unisex} products={unisex} />
         <FragranceLineup lineup={homeLineups.masculine} products={masculine} />
         <Quote />
-        <Gifting />
+        <HomeCta />
       </main>
     </SmoothScroller>
   );

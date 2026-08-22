@@ -9,6 +9,8 @@ import { OurStory } from '@/components/about/OurStory';
 import { Philosophy } from '@/components/about/Philosophy';
 import { WhyChoose } from '@/components/about/WhyChoose';
 import { aboutPageSeo } from '@/lib/about-content';
+import { getAvailableProducts } from '@/lib/catalog-db';
+import { mapFeatured } from '@/lib/featured-perfumes';
 import { SITE_NAME } from '@/lib/site';
 import {
   getAboutPageJsonLd,
@@ -44,7 +46,11 @@ export const metadata: Metadata = {
   },
 };
 
-export default function AboutPage() {
+export const dynamic = 'force-dynamic';
+
+export default async function AboutPage() {
+  const products = await getAvailableProducts();
+  const featured = mapFeatured(products);
   const breadcrumbLd = getBreadcrumbJsonLd([
     { name: 'Home', path: '/' },
     { name: 'About', path: '/about' },
@@ -67,7 +73,7 @@ export default function AboutPage() {
           <OurStory />
           <Philosophy />
           <WhyChoose />
-          <FragranceCategories />
+          <FragranceCategories items={featured} />
           <Craftsmanship />
           <BrandValues />
           <CustomerExperience />

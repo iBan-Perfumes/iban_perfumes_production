@@ -1178,6 +1178,102 @@
   }
 }
 
+@media (max-width: 767px) {
+  .cinematic-carousel .cc-shell {
+    padding: 14px 16px 16px;
+  }
+
+  .cinematic-carousel .cc-brand-logo {
+    width: 4rem;
+  }
+
+  .cinematic-carousel .cc-main {
+    align-items: flex-start;
+    padding: 12px 0 16px;
+  }
+
+  .cinematic-carousel .cc-hero-layout {
+    gap: 0;
+    padding-top: 12px;
+  }
+
+  .cinematic-carousel .cc-story {
+    min-width: 0;
+  }
+
+  .cinematic-carousel .cc-eyebrow-row {
+    margin-bottom: 12px;
+  }
+
+  .cinematic-carousel .cc-story-title {
+    margin-bottom: 14px;
+    font-size: clamp(1.9rem, 8.8vw, 2.45rem);
+    line-height: 0.95;
+  }
+
+  .cinematic-carousel .cc-title-accent {
+    margin-left: 10px;
+  }
+
+  .cinematic-carousel .cc-story-description {
+    max-width: 100%;
+    margin-bottom: 14px;
+    overflow-wrap: break-word;
+  }
+
+  .cinematic-carousel .cc-genre-list {
+    max-width: 100%;
+    margin-bottom: 18px;
+  }
+
+  .cinematic-carousel .cc-preview-rail {
+    display: none;
+  }
+
+  .cinematic-carousel .cc-progress-area {
+    display: none;
+  }
+
+  .cinematic-carousel .cc-bottom-bar {
+    width: 100%;
+    min-width: 0;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 12px;
+    padding-top: 14px;
+  }
+
+  .cinematic-carousel .cc-pagination {
+    grid-column: 1;
+    grid-row: 1;
+    min-width: 0;
+  }
+
+  .cinematic-carousel .cc-nav {
+    grid-column: 2;
+    grid-row: 1;
+    flex-shrink: 0;
+  }
+
+  .cinematic-carousel .cc-nav-button {
+    width: 40px;
+    height: 40px;
+  }
+
+  .cinematic-carousel .cc-story-actions {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
+
+  .cinematic-carousel .cc-primary-button,
+  .cinematic-carousel .cc-secondary-button {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding-inline: 16px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .cinematic-carousel .cc-background-slide.is-active.move-next,
   .cinematic-carousel .cc-background-slide.is-active.move-previous,

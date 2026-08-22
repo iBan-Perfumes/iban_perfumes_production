@@ -1,6 +1,13 @@
 import Link from 'next/link';
 import { BrandLogo } from '@/components/layout/BrandLogo';
-import { navLinks, SITE_DESCRIPTION, SITE_NAME } from '@/lib/site';
+import {
+  contactInfo,
+  getSocialLinks,
+  navLinks,
+  SITE_DESCRIPTION,
+  SITE_NAME,
+  type SocialLink,
+} from '@/lib/site';
 
 function WhatsAppIcon({ className }: { className?: string }) {
   return (
@@ -26,14 +33,16 @@ function FacebookIcon({ className }: { className?: string }) {
   );
 }
 
-const socialPlaceholders = [
-  { label: 'WhatsApp', icon: WhatsAppIcon },
-  { label: 'Instagram', icon: InstagramIcon },
-  { label: 'Facebook', icon: FacebookIcon },
-] as const;
+const socialIcons: Record<SocialLink['label'], typeof WhatsAppIcon> = {
+  WhatsApp: WhatsAppIcon,
+  Instagram: InstagramIcon,
+  Facebook: FacebookIcon,
+};
 
 export function Footer() {
   const year = new Date().getFullYear();
+  const socials = getSocialLinks();
+  const phoneHref = contactInfo.phone.replace(/\s/g, '');
 
   return (
     <footer className="bg-stone-900 text-white">
@@ -74,9 +83,35 @@ export function Footer() {
             </p>
             <div className="mt-4 space-y-2 text-sm leading-relaxed text-white/70">
               <p className="font-medium text-white/90">{SITE_NAME}</p>
-              <p>Address coming soon</p>
-              <p>Phone coming soon</p>
-              <p>Email coming soon</p>
+              {contactInfo.address ? (
+                <p>{contactInfo.address}</p>
+              ) : (
+                <p>Address coming soon</p>
+              )}
+              {contactInfo.phone ? (
+                <p>
+                  <a
+                    href={`tel:${phoneHref}`}
+                    className="transition-colors hover:text-amber-200"
+                  >
+                    {contactInfo.phone}
+                  </a>
+                </p>
+              ) : (
+                <p>Phone coming soon</p>
+              )}
+              {contactInfo.email ? (
+                <p>
+                  <a
+                    href={`mailto:${contactInfo.email}`}
+                    className="transition-colors hover:text-amber-200"
+                  >
+                    {contactInfo.email}
+                  </a>
+                </p>
+              ) : (
+                <p>Email coming soon</p>
+              )}
             </div>
           </div>
 
@@ -85,18 +120,39 @@ export function Footer() {
               Follow Us
             </p>
             <div className="mt-4 flex gap-3">
-              {socialPlaceholders.map((s) => (
-                <span
-                  key={s.label}
-                  title={`${s.label} — coming soon`}
-                  aria-label={`${s.label} — coming soon`}
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/15 text-white/50"
-                >
-                  <s.icon className="h-5 w-5" />
-                </span>
-              ))}
+              {socials.map((s) => {
+                const Icon = socialIcons[s.label];
+                const iconClass =
+                  'inline-flex h-10 w-10 items-center justify-center rounded-full border';
+
+                if (s.href) {
+                  return (
+                    <a
+                      key={s.label}
+                      href={s.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={s.label}
+                      className={`${iconClass} border-white/15 text-white/70 transition-colors hover:border-amber-200 hover:text-amber-200`}
+                    >
+                      <Icon className="h-5 w-5" />
+                    </a>
+                  );
+                }
+
+                return (
+                  <span
+                    key={s.label}
+                    aria-disabled="true"
+                    aria-label={`${s.label} — coming soon`}
+                    title={`${s.label} — coming soon`}
+                    className={`${iconClass} pointer-events-none border-white/15 text-white/40 opacity-60`}
+                  >
+                    <Icon className="h-5 w-5" />
+                  </span>
+                );
+              })}
             </div>
-            <p className="mt-3 text-xs tracking-wide text-white/40">Coming soon</p>
           </div>
         </div>
 

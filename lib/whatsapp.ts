@@ -6,6 +6,14 @@ export function isWhatsAppConfigured(): boolean {
   return getWhatsAppNumber().length >= 10;
 }
 
+export function getWhatsAppChatUrl(): string | null {
+  const number = getWhatsAppNumber();
+  if (!number) return null;
+
+  const text = "Hello, I'd like to enquire about i-BAN Perfumes.";
+  return `https://wa.me/${number}?text=${encodeURIComponent(text)}`;
+}
+
 export function getWhatsAppBuyUrl(productName: string): string | null {
   const number = getWhatsAppNumber();
   if (!number) return null;
