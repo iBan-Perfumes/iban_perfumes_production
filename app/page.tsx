@@ -3,7 +3,7 @@ import { About } from '@/components/sections/About';
 import { Featured } from '@/components/sections/Featured';
 import { Collection } from '@/components/sections/Collection';
 import { FragranceLineup } from '@/components/sections/FragranceLineup';
-import { Quote } from '@/components/sections/Quote';
+import { Reviews } from '@/components/sections/Reviews';
 import { HomeCta } from '@/components/sections/HomeCta';
 import { SmoothScroller } from '@/components/SmoothScroller';
 import { getAvailableProducts } from '@/lib/catalog-db';
@@ -27,7 +27,7 @@ export default async function HomePage() {
         <Collection products={products} />
         <FragranceLineup lineup={homeLineups.unisex} products={unisex} />
         <FragranceLineup lineup={homeLineups.masculine} products={masculine} />
-        <Quote />
+        <Reviews />
         <HomeCta />
       </main>
     </SmoothScroller>
