@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { Mail, MapPin, Phone } from 'lucide-react';
 import { BrandLogo } from '@/components/layout/BrandLogo';
 import {
   contactInfo,
@@ -54,7 +55,7 @@ export function Footer() {
                 <BrandLogo variant="transparent" tone="light" />
               </span>
             </Link>
-            <p className="mt-4 max-w-xs text-sm leading-relaxed text-white/60">
+            <p className="mt-4 max-w-xs text-sm leading-relaxed text-white">
               {SITE_DESCRIPTION}
             </p>
           </div>
@@ -68,7 +69,7 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-white/70 transition-colors hover:text-amber-200"
+                    className="text-sm text-white transition-colors hover:text-amber-200"
                   >
                     {link.label}
                   </Link>
@@ -81,36 +82,52 @@ export function Footer() {
             <p className="text-sm font-semibold uppercase tracking-wide text-amber-200">
               Contact
             </p>
-            <div className="mt-4 space-y-2 text-sm leading-relaxed text-white/70">
-              <p className="font-medium text-white/90">{SITE_NAME}</p>
+            <div className="mt-4 space-y-3 text-sm leading-relaxed text-white">
               {contactInfo.address ? (
-                <p>{contactInfo.address}</p>
+                <div className="flex items-start gap-3">
+                  <MapPin
+                    size={16}
+                    className="mt-0.5 shrink-0 text-amber-400"
+                    aria-hidden
+                  />
+                  <p>{contactInfo.address}</p>
+                </div>
               ) : (
                 <p>Address coming soon</p>
               )}
-              {contactInfo.phone ? (
-                <p>
-                  <a
-                    href={`tel:${phoneHref}`}
-                    className="transition-colors hover:text-amber-200"
-                  >
-                    {contactInfo.phone}
-                  </a>
-                </p>
-              ) : (
-                <p>Phone coming soon</p>
-              )}
               {contactInfo.email ? (
-                <p>
+                <div className="flex items-start gap-3">
+                  <Mail
+                    size={16}
+                    className="mt-0.5 shrink-0 text-amber-400"
+                    aria-hidden
+                  />
                   <a
                     href={`mailto:${contactInfo.email}`}
                     className="transition-colors hover:text-amber-200"
                   >
                     {contactInfo.email}
                   </a>
-                </p>
+                </div>
               ) : (
                 <p>Email coming soon</p>
+              )}
+              {contactInfo.phone ? (
+                <div className="flex items-start gap-3">
+                  <Phone
+                    size={16}
+                    className="mt-0.5 shrink-0 text-amber-400"
+                    aria-hidden
+                  />
+                  <a
+                    href={`tel:${phoneHref}`}
+                    className="transition-colors hover:text-amber-200"
+                  >
+                    {contactInfo.phone}
+                  </a>
+                </div>
+              ) : (
+                <p>Phone coming soon</p>
               )}
             </div>
           </div>
@@ -133,7 +150,7 @@ export function Footer() {
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label={s.label}
-                      className={`${iconClass} border-white/15 text-white/70 transition-colors hover:border-amber-200 hover:text-amber-200`}
+                      className={`${iconClass} border-white/15 text-white transition-colors hover:border-amber-200 hover:text-amber-200`}
                     >
                       <Icon className="h-5 w-5" />
                     </a>
@@ -156,7 +173,7 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 border-t border-white/10 pt-6 text-left text-sm text-white/50">
+        <div className="mt-12 border-t border-white/10 pt-6 text-left text-sm text-white">
           <p>
             © {year} {SITE_NAME}. Premium fragrances for everyday luxury.
           </p>
@@ -166,7 +183,7 @@ export function Footer() {
               href="https://www.mentecode.com/"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-white/70 transition-colors hover:text-amber-200"
+              className="text-white transition-colors hover:text-amber-200"
             >
               Mentecode
             </a>
