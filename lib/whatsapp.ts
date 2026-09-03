@@ -22,6 +22,29 @@ export function getWhatsAppBuyUrl(productName: string): string | null {
   return `https://wa.me/${number}?text=${encodeURIComponent(text)}`;
 }
 
+type ContactMessage = {
+  name: string;
+  phone: string;
+  email: string;
+  message: string;
+};
+
+export function getWhatsAppContactUrl(fields: ContactMessage): string | null {
+  const number = getWhatsAppNumber();
+  if (!number) return null;
+
+  const text = [
+    "Hello, I'd like to get in touch with i-BAN Perfumes.",
+    '',
+    `Name: ${fields.name}`,
+    `Phone: ${fields.phone}`,
+    `Email: ${fields.email}`,
+    `Message: ${fields.message}`,
+  ].join('\n');
+
+  return `https://wa.me/${number}?text=${encodeURIComponent(text)}`;
+}
+
 type OrderOpts = {
   variantName?: string;
   unitPrice?: number;

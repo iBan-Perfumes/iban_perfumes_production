@@ -4,6 +4,7 @@ import { useState, FormEvent, type ReactNode } from 'react';
 import { Mail, MapPin, Phone, Instagram, Facebook } from 'lucide-react';
 import { Reveal } from '@/components/ui/Reveal';
 import { contactInfo, getSocialLinks, type SocialLink } from '@/lib/site';
+import { getWhatsAppContactUrl } from '@/lib/whatsapp';
 
 function WhatsAppIcon({ size }: { size: number }) {
   return (
@@ -28,9 +29,22 @@ const socialIcons: Record<SocialLink['label'], (size: number) => ReactNode> = {
 export function ContactFormSection() {
   const [sent, setSent] = useState(false);
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const form = e.currentTarget;
+    const data = new FormData(form);
+    const url = getWhatsAppContactUrl({
+      name: String(data.get('name') ?? '').trim(),
+      phone: String(data.get('phone') ?? '').trim(),
+      email: String(data.get('email') ?? '').trim(),
+      message: String(data.get('message') ?? '').trim(),
+    });
+
+    if (!url) return;
+
     setSent(true);
+    window.open(url, '_blank', 'noopener,noreferrer');
+    form.reset();
     setTimeout(() => setSent(false), 4000);
   };
 
@@ -57,23 +71,35 @@ export function ContactFormSection() {
 
               <div className="space-y-5">
                 {contactInfo.address && (
-                  <div className="flex items-center gap-4 text-stone-600">
-                    <MapPin size={20} className="text-amber-700" aria-hidden />
+                  <div className="flex items-start gap-4 text-stone-600">
+                    <MapPin
+                      size={20}
+                      className="mt-0.5 shrink-0 text-amber-700"
+                      aria-hidden
+                    />
                     <span>{contactInfo.address}</span>
                   </div>
                 )}
+                {contactInfo.email && (
+                  <div className="flex items-start gap-4 text-stone-600">
+                    <Mail
+                      size={20}
+                      className="mt-0.5 shrink-0 text-amber-700"
+                      aria-hidden
+                    />
+                    <a href={`mailto:${contactInfo.email}`}>{contactInfo.email}</a>
+                  </div>
+                )}
                 {contactInfo.phone && (
-                  <div className="flex items-center gap-4 text-stone-600">
-                    <Phone size={20} className="text-amber-700" aria-hidden />
+                  <div className="flex items-start gap-4 text-stone-600">
+                    <Phone
+                      size={20}
+                      className="mt-0.5 shrink-0 text-amber-700"
+                      aria-hidden
+                    />
                     <a href={`tel:${contactInfo.phone.replace(/\s/g, '')}`}>
                       {contactInfo.phone}
                     </a>
-                  </div>
-                )}
-                {contactInfo.email && (
-                  <div className="flex items-center gap-4 text-stone-600">
-                    <Mail size={20} className="text-amber-700" aria-hidden />
-                    <a href={`mailto:${contactInfo.email}`}>{contactInfo.email}</a>
                   </div>
                 )}
                 {!contactInfo.address &&

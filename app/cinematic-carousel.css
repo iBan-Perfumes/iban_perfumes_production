@@ -1207,7 +1207,7 @@
 
   .cinematic-carousel .cc-story-title {
     margin-bottom: 14px;
-    font-size: clamp(1.9rem, 8.8vw, 2.45rem);
+    font-size: clamp(2.35rem, 11vw, 3rem);
     line-height: 0.95;
   }
 
@@ -1223,7 +1223,7 @@
 
   .cinematic-carousel .cc-genre-list {
     max-width: 100%;
-    margin-bottom: 18px;
+    margin-bottom: 28px;
   }
 
   .cinematic-carousel .cc-preview-rail {
@@ -1260,17 +1260,23 @@
   }
 
   .cinematic-carousel .cc-story-actions {
-    flex-direction: column;
+    flex-direction: row;
+    flex-wrap: nowrap;
     align-items: stretch;
+    gap: 8px;
     width: 100%;
   }
 
   .cinematic-carousel .cc-primary-button,
   .cinematic-carousel .cc-secondary-button {
-    width: 100%;
+    flex: 1;
+    width: auto;
+    min-width: 0;
     max-width: 100%;
     box-sizing: border-box;
-    padding-inline: 16px;
+    padding-inline: 10px;
+    font-size: 0.62rem;
+    white-space: nowrap;
   }
 }
 

@@ -29,9 +29,10 @@ export const contactInfo: {
   phone: string;
   email: string;
 } = {
-  address: '',
+  address:
+    'i-BAN Perfumes, Near Famous bakery, Kambalkkad, Wayanad, Kerala, Pin: 673122',
   phone: (process.env.NEXT_PUBLIC_PHONE_NUMBER ?? '').trim(),
-  email: '',
+  email: 'ibanhub950@gmail.com',
 };
 
 export type SocialLink = {
